@@ -276,6 +276,10 @@
 
     <!-- Contact Section -->
     <section id="contact" class="py-20 bg-gray-50">
+        @php
+            $contactInfo = \App\Models\ContactInformation::getActive();
+        @endphp
+        
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-16">
                 <h2 class="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Get In Touch</h2>
@@ -287,82 +291,117 @@
                 <div>
                     <h3 class="text-2xl font-bold text-gray-800 mb-6">Contact Information</h3>
                     <div class="space-y-4">
+                        @if($contactInfo && $contactInfo->address)
                         <div class="flex items-center">
                             <i class="fas fa-map-marker-alt text-indigo-600 mr-4 text-xl"></i>
                             <div>
                                 <p class="font-semibold text-gray-800">Address</p>
-                                <p class="text-gray-600">123 Islamic Center Street, Madinah Quarter, City 12345</p>
+                                <p class="text-gray-600">{{ $contactInfo->address }}</p>
                             </div>
                         </div>
+                        @endif
+                        
+                        @if($contactInfo && $contactInfo->phone)
                         <div class="flex items-center">
                             <i class="fas fa-phone text-indigo-600 mr-4 text-xl"></i>
                             <div>
                                 <p class="font-semibold text-gray-800">Phone</p>
-                                <p class="text-gray-600">+1 (555) 123-4567</p>
+                                <p class="text-gray-600">{{ $contactInfo->phone }}</p>
                             </div>
                         </div>
+                        @endif
+                        
+                        @if($contactInfo && $contactInfo->email)
                         <div class="flex items-center">
                             <i class="fas fa-envelope text-indigo-600 mr-4 text-xl"></i>
                             <div>
                                 <p class="font-semibold text-gray-800">Email</p>
-                                <p class="text-gray-600">info@ruqyahhijama.com</p>
+                                <p class="text-gray-600">{{ $contactInfo->email }}</p>
                             </div>
                         </div>
+                        @endif
+                        
+                        @if($contactInfo && $contactInfo->business_hours)
                         <div class="flex items-center">
                             <i class="fas fa-clock text-indigo-600 mr-4 text-xl"></i>
                             <div>
                                 <p class="font-semibold text-gray-800">Hours</p>
-                                <p class="text-gray-600">Saturday - Thursday: 9:00 AM - 8:00 PM</p>
-                                <p class="text-gray-600">Friday: 2:00 PM - 8:00 PM</p>
+                                @foreach($contactInfo->business_hours_array as $hour)
+                                    <p class="text-gray-600">{{ $hour }}</p>
+                                @endforeach
                             </div>
                         </div>
+                        @endif
                     </div>
+                    
+                    @if($contactInfo && ($contactInfo->facebook_url || $contactInfo->twitter_url || $contactInfo->instagram_url || $contactInfo->whatsapp_url || $contactInfo->youtube_url || $contactInfo->linkedin_url))
                     <div class="mt-8">
                         <h4 class="text-xl font-bold text-gray-800 mb-4">Follow Us</h4>
                         <div class="flex space-x-4">
-                            <a href="#" class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white hover:bg-blue-700">
+                            @if($contactInfo->facebook_url)
+                            <a href="{{ $contactInfo->facebook_url }}" target="_blank" class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white hover:bg-blue-700">
                                 <i class="fab fa-facebook-f"></i>
                             </a>
-                            <a href="#" class="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center text-white hover:bg-blue-500">
+                            @endif
+                            
+                            @if($contactInfo->twitter_url)
+                            <a href="{{ $contactInfo->twitter_url }}" target="_blank" class="w-10 h-10 bg-blue-400 rounded-full flex items-center justify-center text-white hover:bg-blue-500">
                                 <i class="fab fa-twitter"></i>
                             </a>
-                            <a href="#" class="w-10 h-10 bg-pink-600 rounded-full flex items-center justify-center text-white hover:bg-pink-700">
+                            @endif
+                            
+                            @if($contactInfo->instagram_url)
+                            <a href="{{ $contactInfo->instagram_url }}" target="_blank" class="w-10 h-10 bg-pink-600 rounded-full flex items-center justify-center text-white hover:bg-pink-700">
                                 <i class="fab fa-instagram"></i>
                             </a>
-                            <a href="#" class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white hover:bg-green-700">
+                            @endif
+                            
+                            @if($contactInfo->whatsapp_url)
+                            <a href="{{ $contactInfo->whatsapp_url }}" target="_blank" class="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center text-white hover:bg-green-700">
                                 <i class="fab fa-whatsapp"></i>
                             </a>
+                            @endif
+                            
+                            @if($contactInfo->youtube_url)
+                            <a href="{{ $contactInfo->youtube_url }}" target="_blank" class="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center text-white hover:bg-red-700">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                            @endif
+                            
+                            @if($contactInfo->linkedin_url)
+                            <a href="{{ $contactInfo->linkedin_url }}" target="_blank" class="w-10 h-10 bg-blue-700 rounded-full flex items-center justify-center text-white hover:bg-blue-800">
+                                <i class="fab fa-linkedin-in"></i>
+                            </a>
+                            @endif
                         </div>
                     </div>
+                    @endif
                 </div>
+                
                 <div class="bg-white rounded-lg shadow-lg p-8">
-                    <h3 class="text-2xl font-bold text-gray-800 mb-6">Book a Consultation</h3>
-                    <form class="space-y-4">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6">
+                        {{ $contactInfo ? $contactInfo->contact_form_title : 'Book a Consultation' }}
+                    </h3>
+                    @if($contactInfo && $contactInfo->contact_form_description)
+                    <p class="text-gray-600 mb-6">{{ $contactInfo->contact_form_description }}</p>
+                    @endif
+                    <form id="contactForm" class="space-y-4">
+                        @csrf
                         <div>
                             <label class="block text-gray-700 font-medium mb-2">Full Name</label>
-                            <input type="text" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter your full name">
+                            <input type="text" name="full_name" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter your full name">
                         </div>
                         <div>
                             <label class="block text-gray-700 font-medium mb-2">Email Address</label>
-                            <input type="email" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter your email">
+                            <input type="email" name="email" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter your email">
                         </div>
                         <div>
                             <label class="block text-gray-700 font-medium mb-2">Phone Number</label>
-                            <input type="tel" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter your phone number">
-                        </div>
-                        <div>
-                            <label class="block text-gray-700 font-medium mb-2">Service Type</label>
-                            <select class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                                <option value="">Select a service</option>
-                                <option value="ruqyah">Ruqyah Healing</option>
-                                <option value="hijama">Hijama (Cupping)</option>
-                                <option value="both">Both Services</option>
-                                <option value="consultation">General Consultation</option>
-                            </select>
+                            <input type="tel" name="phone" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter your phone number">
                         </div>
                         <div>
                             <label class="block text-gray-700 font-medium mb-2">Message</label>
-                            <textarea rows="4" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Tell us about your needs..."></textarea>
+                            <textarea name="message" rows="4" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Tell us about your needs..."></textarea>
                         </div>
                         <button type="submit" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition duration-300">
                             Send Message
@@ -457,11 +496,46 @@
         });
 
         // Form submission handler - only for contact form
-        const contactForm = document.querySelector('#contact form');
+        const contactForm = document.getElementById('contactForm');
         if (contactForm) {
             contactForm.addEventListener('submit', function(e) {
                 e.preventDefault();
-                alert('Thank you for your message! We will contact you soon, In Sha Allah.');
+                
+                const formData = new FormData(this);
+                const submitButton = this.querySelector('button[type="submit"]');
+                const originalText = submitButton.innerHTML;
+                
+                // Disable button and show loading
+                submitButton.disabled = true;
+                submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+                
+                fetch('/contact-form/submit', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        // Reload the page after alert is clicked
+                        window.location.reload();
+                    } else {
+                        alert(data.message || 'Something went wrong. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Something went wrong. Please try again.');
+                })
+                .finally(() => {
+                    // Re-enable button
+                    submitButton.disabled = false;
+                    submitButton.innerHTML = originalText;
+                });
             });
         }
     </script>

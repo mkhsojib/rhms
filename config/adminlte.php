@@ -504,6 +504,24 @@ return [
         ],
 
         [
+            'text' => 'Website Management',
+            'icon' => 'fas fa-fw fa-globe',
+            'can' => 'super_admin',
+            'submenu' => [
+                [
+                    'text' => 'Contact Information',
+                    'url' => '/superadmin/contact-information',
+                    'icon' => 'fas fa-fw fa-address-book',
+                ],
+                [
+                    'text' => 'Contact Form Submissions',
+                    'url' => '/superadmin/contact-form-submissions',
+                    'icon' => 'fas fa-fw fa-envelope',
+                ],
+            ],
+        ],
+
+        [
             'text' => 'Raqis Available Time',
             'icon' => 'fas fa-fw fa-clock',
             'can' => 'super_admin',

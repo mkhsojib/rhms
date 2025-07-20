@@ -73,6 +73,11 @@ Route::middleware(['auth', 'checkRole:super_admin'])->prefix('superadmin')->name
     Route::resource('raqi-availability', SuperAdminRaqiAvailabilityController::class)->parameters(['raqi-availability' => 'availability']);
     Route::resource('blogs', App\Http\Controllers\SuperAdmin\BlogController::class); // <-- Add this line
     Route::resource('categories', App\Http\Controllers\SuperAdmin\CategoryController::class);
+    Route::resource('contact-information', App\Http\Controllers\SuperAdmin\ContactInformationController::class);
+    Route::resource('contact-form-submissions', App\Http\Controllers\SuperAdmin\ContactFormSubmissionController::class);
+    Route::patch('contact-form-submissions/{contactFormSubmission}/mark-read', [App\Http\Controllers\SuperAdmin\ContactFormSubmissionController::class, 'markAsRead'])->name('contact-form-submissions.mark-read');
+    Route::patch('contact-form-submissions/{contactFormSubmission}/mark-replied', [App\Http\Controllers\SuperAdmin\ContactFormSubmissionController::class, 'markAsReplied'])->name('contact-form-submissions.mark-replied');
+    Route::get('contact-form-submissions/filter', [App\Http\Controllers\SuperAdmin\ContactFormSubmissionController::class, 'filter'])->name('contact-form-submissions.filter');
     
     // Appointment action routes
     Route::patch('appointments/{appointment}/approve', [SuperAdminAppointmentController::class, 'approve'])->name('appointments.approve');
@@ -116,5 +121,8 @@ Route::post('/patient/appointments/get-available-time-slots', [App\Http\Controll
 // Public Blog Routes
 Route::get('blogs', [App\Http\Controllers\BlogController::class, 'index'])->name('blog.index');
 Route::get('blogs/{blog}', [App\Http\Controllers\BlogController::class, 'show'])->name('blog.show');
+
+// Contact Form Routes
+Route::post('/contact-form/submit', [App\Http\Controllers\ContactFormController::class, 'submit'])->name('contact-form.submit');
 
 
