@@ -33,42 +33,42 @@
                                     <table class="table table-borderless">
                                         <tr>
                                             <th width="150">Full Name:</th>
-                                            <td>{{ $submission->full_name }}</td>
+                                            <td>{{ $contactFormSubmission->full_name }}</td>
                                         </tr>
                                         <tr>
                                             <th>Email:</th>
                                             <td>
-                                                <a href="mailto:{{ $submission->email }}">{{ $submission->email }}</a>
+                                                <a href="mailto:{{ $contactFormSubmission->email }}">{{ $contactFormSubmission->email }}</a>
                                             </td>
                                         </tr>
                                         <tr>
                                             <th>Phone:</th>
                                             <td>
-                                                <a href="tel:{{ $submission->phone }}">{{ $submission->phone }}</a>
+                                                <a href="tel:{{ $contactFormSubmission->phone }}">{{ $contactFormSubmission->phone }}</a>
                                             </td>
                                         </tr>
                                         <tr>
                                             <th>Status:</th>
                                             <td>
-                                                <span class="{{ $submission->status_badge_class }}">
-                                                    {{ $submission->status_text }}
+                                                <span class="{{ $contactFormSubmission->status_badge_class }}">
+                                                    {{ $contactFormSubmission->status_text }}
                                                 </span>
                                             </td>
                                         </tr>
                                         <tr>
                                             <th>Submitted:</th>
-                                            <td>{{ $submission->created_at->format('F d, Y \a\t g:i A') }}</td>
+                                            <td>{{ $contactFormSubmission->created_at->format('F d, Y \a\t g:i A') }}</td>
                                         </tr>
-                                        @if($submission->read_at)
+                                        @if($contactFormSubmission->read_at)
                                         <tr>
                                             <th>Read At:</th>
-                                            <td>{{ $submission->read_at->format('F d, Y \a\t g:i A') }}</td>
+                                            <td>{{ $contactFormSubmission->read_at->format('F d, Y \a\t g:i A') }}</td>
                                         </tr>
                                         @endif
-                                        @if($submission->replied_at)
+                                        @if($contactFormSubmission->replied_at)
                                         <tr>
                                             <th>Replied At:</th>
-                                            <td>{{ $submission->replied_at->format('F d, Y \a\t g:i A') }}</td>
+                                            <td>{{ $contactFormSubmission->replied_at->format('F d, Y \a\t g:i A') }}</td>
                                         </tr>
                                         @endif
                                     </table>
@@ -81,19 +81,19 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="bg-light p-3 rounded">
-                                        {{ $submission->message }}
+                                        {{ $contactFormSubmission->message }}
                                     </div>
                                 </div>
                             </div>
 
-                            @if($submission->admin_notes)
+                            @if($contactFormSubmission->admin_notes)
                             <div class="card mt-4">
                                 <div class="card-header">
                                     <h4>Admin Notes</h4>
                                 </div>
                                 <div class="card-body">
                                     <div class="bg-warning p-3 rounded">
-                                        {{ $submission->admin_notes }}
+                                        {{ $contactFormSubmission->admin_notes }}
                                     </div>
                                 </div>
                             </div>
@@ -107,8 +107,8 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="d-grid gap-2">
-                                        @if($submission->status === 'new')
-                                        <form action="{{ route('superadmin.contact-form-submissions.mark-read', $submission->id) }}" method="POST">
+                                        @if($contactFormSubmission->status === 'new')
+                                        <form action="{{ route('superadmin.contact-form-submissions.mark-read', $contactFormSubmission->id) }}" method="POST">
                                             @csrf
                                             @method('PATCH')
                                             <button type="submit" class="btn btn-primary btn-block">
@@ -117,8 +117,8 @@
                                         </form>
                                         @endif
 
-                                        @if($submission->status !== 'replied')
-                                        <form action="{{ route('superadmin.contact-form-submissions.mark-replied', $submission->id) }}" method="POST">
+                                        @if($contactFormSubmission->status !== 'replied')
+                                        <form action="{{ route('superadmin.contact-form-submissions.mark-replied', $contactFormSubmission->id) }}" method="POST">
                                             @csrf
                                             @method('PATCH')
                                             <button type="submit" class="btn btn-success btn-block">
@@ -127,15 +127,15 @@
                                         </form>
                                         @endif
 
-                                        <a href="{{ route('superadmin.contact-form-submissions.edit', $submission->id) }}" class="btn btn-warning btn-block">
+                                        <a href="{{ route('superadmin.contact-form-submissions.edit', $contactFormSubmission->id) }}" class="btn btn-warning btn-block">
                                             <i class="fas fa-edit"></i> Edit Submission
                                         </a>
 
-                                        <a href="mailto:{{ $submission->email }}?subject=Re: Your Contact Form Submission" class="btn btn-info btn-block">
+                                        <a href="mailto:{{ $contactFormSubmission->email }}?subject=Re: Your Contact Form Submission" class="btn btn-info btn-block">
                                             <i class="fas fa-envelope"></i> Reply via Email
                                         </a>
 
-                                        <form action="{{ route('superadmin.contact-form-submissions.destroy', $submission->id) }}" 
+                                        <form action="{{ route('superadmin.contact-form-submissions.destroy', $contactFormSubmission->id) }}" 
                                               method="POST" 
                                               onsubmit="return confirm('Are you sure you want to delete this submission?')">
                                             @csrf
