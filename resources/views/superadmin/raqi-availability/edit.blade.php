@@ -73,12 +73,12 @@
                             <label for="slot_duration">Slot Duration (minutes) *</label>
                             <select name="slot_duration" id="slot_duration" class="form-control @error('slot_duration') is-invalid @enderror" required>
                                 <option value="">Select Duration</option>
-                                <option value="15" {{ old('slot_duration', $availability->slot_duration) == '15' ? 'selected' : '' }}>15 minutes</option>
-                                <option value="30" {{ old('slot_duration', $availability->slot_duration) == '30' ? 'selected' : '' }}>30 minutes</option>
-                                <option value="45" {{ old('slot_duration', $availability->slot_duration) == '45' ? 'selected' : '' }}>45 minutes</option>
-                                <option value="60" {{ old('slot_duration', $availability->slot_duration) == '60' ? 'selected' : '' }}>1 hour</option>
-                                <option value="90" {{ old('slot_duration', $availability->slot_duration) == '90' ? 'selected' : '' }}>1.5 hours</option>
-                                <option value="120" {{ old('slot_duration', $availability->slot_duration) == '120' ? 'selected' : '' }}>2 hours</option>
+                                <option value="15" {{ old('slot_duration', $availability->slot_duration) == 15 ? 'selected' : '' }}>15 minutes</option>
+                                <option value="30" {{ old('slot_duration', $availability->slot_duration) == 30 ? 'selected' : '' }}>30 minutes</option>
+                                <option value="45" {{ old('slot_duration', $availability->slot_duration) == 45 ? 'selected' : '' }}>45 minutes</option>
+                                <option value="60" {{ old('slot_duration', $availability->slot_duration) == 60 ? 'selected' : '' }}>1 hour</option>
+                                <option value="90" {{ old('slot_duration', $availability->slot_duration) == 90 ? 'selected' : '' }}>1.5 hours</option>
+                                <option value="120" {{ old('slot_duration', $availability->slot_duration) == 120 ? 'selected' : '' }}>2 hours</option>
                             </select>
                             @error('slot_duration')
                                 <span class="invalid-feedback">{{ $message }}</span>
@@ -189,14 +189,14 @@ document.addEventListener('DOMContentLoaded', function() {
         html += '<div class="row mt-2">';
         slots.forEach((slot, index) => {
             html += `<div class="col-md-3 mb-2">
-                        <span class="badge badge-primary">${slot.start} - ${slot.end}</span>
+                        <span class="text-dark">${slot.start} - ${slot.end}</span>
                      </div>`;
         });
         html += '</div>';
         html += `<small class="text-muted">Total: ${slots.length} slots</small>`;
 
         previewDiv.innerHTML = html;
-        previewDiv.className = 'alert alert-success';
+        previewDiv.className = 'alert alert-light';
     }
 
     // Add event listeners
