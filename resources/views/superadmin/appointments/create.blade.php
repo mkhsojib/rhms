@@ -9,16 +9,7 @@
 @section('content')
     <div class="card">
         <div class="card-body">
-            <!-- Debug info -->
-            <div class="alert alert-info" style="background: #f8f9fa; padding: 10px; margin-bottom: 15px; border-radius: 5px;">
-                <small class="text-muted">
-                    <strong>Debug Info:</strong><br>
-                    Available Dates Count: {{ count($availableDates) }}<br>
-                    Has Data: {{ !empty($availableDates) ? 'Yes' : 'No' }}<br>
-                    <strong>PHP Timezone:</strong> {{ config('app.timezone') }}<br>
-                    <span id="js-debug">JavaScript not loaded yet</span>
-                </small>
-            </div>
+
             
             <form action="{{ route('superadmin.appointments.store') }}" method="POST">
                 @csrf
@@ -720,11 +711,7 @@ document.addEventListener('DOMContentLoaded', function() {
         renderCalendar(currentMonth, currentYear);
     };
 
-    // Update debug info
-    const jsDebug = document.getElementById('js-debug');
-    if (jsDebug) {
-        jsDebug.textContent = 'JavaScript loaded successfully - ' + new Date().toLocaleTimeString();
-    }
+
     
     // Initial setup
     filterPractitioners();
