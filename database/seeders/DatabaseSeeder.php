@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             SettingsSeeder::class,    // Seed default settings first
             SuperAdminSeeder::class,  // Then seed users
             RaqiAvailabilitySeeder::class, // Then seed availability records
+            ContactInformationSeeder::class, // Then seed contact information
         ]);
     }
 }
