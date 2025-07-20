@@ -6,6 +6,7 @@ use App\Http\Controllers\SuperAdmin\UserController as SuperAdminUserController;
 use App\Http\Controllers\SuperAdmin\SettingController as SuperAdminSettingController;
 use App\Http\Controllers\SuperAdmin\AppointmentController as SuperAdminAppointmentController;
 use App\Http\Controllers\SuperAdmin\TreatmentController as SuperAdminTreatmentController;
+use App\Http\Controllers\SuperAdmin\RaqiAvailabilityController as SuperAdminRaqiAvailabilityController;
 use App\Http\Controllers\Admin\AppointmentController as AdminAppointmentController;
 use App\Http\Controllers\Admin\TreatmentController as AdminTreatmentController;
 use App\Http\Controllers\Admin\ProfileController as AdminProfileController;
@@ -61,10 +62,15 @@ Route::middleware(['auth', 'checkRole:admin,super_admin'])->prefix('admin')->nam
 
 // Super Admin Routes
 Route::middleware(['auth', 'checkRole:super_admin'])->prefix('superadmin')->name('superadmin.')->group(function () {
+    // Route model binding for raqi availability
+    Route::bind('availability', function ($value) {
+        return \App\Models\RaqiMonthlyAvailability::findOrFail($value);
+    });
     Route::resource('users', SuperAdminUserController::class);
     Route::resource('settings', SuperAdminSettingController::class);
     Route::resource('appointments', SuperAdminAppointmentController::class);
     Route::resource('treatments', SuperAdminTreatmentController::class);
+    Route::resource('raqi-availability', SuperAdminRaqiAvailabilityController::class)->parameters(['raqi-availability' => 'availability']);
     Route::resource('blogs', App\Http\Controllers\SuperAdmin\BlogController::class); // <-- Add this line
     Route::resource('categories', App\Http\Controllers\SuperAdmin\CategoryController::class);
     

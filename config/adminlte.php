@@ -503,6 +503,24 @@ return [
             ],
         ],
 
+        [
+            'text' => 'Raqis Available Time',
+            'icon' => 'fas fa-fw fa-clock',
+            'can' => 'super_admin',
+            'submenu' => [
+                [
+                    'text' => 'All Availability',
+                    'url' => '/superadmin/raqi-availability',
+                    'icon' => 'fas fa-fw fa-list',
+                ],
+                [
+                    'text' => 'Add Availability',
+                    'url' => '/superadmin/raqi-availability/create',
+                    'icon' => 'fas fa-fw fa-plus',
+                ],
+            ],
+        ],
+
         // Account Settings
         ['header' => 'Account Settings'],
         [
