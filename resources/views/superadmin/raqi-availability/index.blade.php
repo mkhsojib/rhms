@@ -17,6 +17,46 @@
             </div>
         </div>
         <div class="card-body">
+            <!-- Raqis Overview -->
+            <div class="row mb-4">
+                @foreach($practitioners as $practitioner)
+                    @php
+                        // We need to get the availability data for each practitioner
+                        $practitionerAvailabilities = \App\Models\RaqiMonthlyAvailability::where('practitioner_id', $practitioner->id)
+                            ->where('availability_date', '>=', \Carbon\Carbon::now()->format('Y-m-d'))
+                            ->where('availability_date', '<=', \Carbon\Carbon::now()->addMonth()->format('Y-m-d'))
+                            ->get();
+                        $availableCount = $practitionerAvailabilities->where('is_available', true)->count();
+                        $unavailableCount = $practitionerAvailabilities->where('is_available', false)->count();
+                    @endphp
+                    <div class="col-md-4 mb-3">
+                        <div class="card border-primary">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">{{ $practitioner->name }}</h5>
+                                <p class="card-text text-muted">{{ $practitioner->email }}</p>
+                                @if($practitioner->specialization)
+                                    <span class="badge badge-info mb-2">{{ $practitioner->specialization_label }}</span>
+                                @endif
+                                <div class="row text-center">
+                                    <div class="col-6">
+                                        <small class="text-success">Available: {{ $availableCount }}</small>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-warning">Unavailable: {{ $unavailableCount }}</small>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <a href="{{ route('superadmin.raqi-availability.by-practitioner', $practitioner->id) }}" 
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="fas fa-eye"></i> View Availability
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
             @if(session('success'))
                 <div class="alert alert-success alert-dismissible">
                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -28,89 +68,6 @@
                 <div class="alert alert-danger alert-dismissible">
                     <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
                     {{ session('error') }}
-                </div>
-            @endif
-
-            <div class="table-responsive">
-                <table class="table table-bordered table-striped">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Raqi Name</th>
-                            <th>Date</th>
-                            <th>Start Time</th>
-                            <th>End Time</th>
-                            <th>Slot Duration</th>
-                            <th>Status</th>
-                            <th>Notes</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($availabilities as $availability)
-                            <tr>
-                                <td>{{ $availability->id }}</td>
-                                <td>
-                                    <strong>{{ $availability->practitioner->name }}</strong>
-                                    <br>
-                                    <small class="text-muted">{{ $availability->practitioner->email }}</small>
-                                </td>
-                                <td>
-                                    {{ $availability->availability_date->format('M d, Y') }}
-                                    <br>
-                                    <small class="text-muted">{{ $availability->availability_date->format('l') }}</small>
-                                </td>
-                                <td>{{ $availability->start_time }}</td>
-                                <td>{{ $availability->end_time }}</td>
-                                <td>{{ $availability->slot_duration }} minutes</td>
-                                <td>
-                                    @if($availability->is_available)
-                                        <span class="badge badge-success">Available</span>
-                                    @else
-                                        <span class="badge badge-danger">Not Available</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    @if($availability->notes)
-                                        <span class="text-muted">{{ Str::limit($availability->notes, 50) }}</span>
-                                    @else
-                                        <span class="text-muted">No notes</span>
-                                    @endif
-                                </td>
-                                <td>
-                                    <div class="btn-group" role="group">
-                                        <a href="{{ route('superadmin.raqi-availability.show', $availability) }}" 
-                                           class="btn btn-info btn-sm" title="View">
-                                            <i class="fas fa-eye"></i>
-                                        </a>
-                                        <a href="{{ route('superadmin.raqi-availability.edit', $availability) }}" 
-                                           class="btn btn-warning btn-sm" title="Edit">
-                                            <i class="fas fa-edit"></i>
-                                        </a>
-                                        <form action="{{ route('superadmin.raqi-availability.destroy', $availability) }}" 
-                                              method="POST" style="display: inline;" 
-                                              onsubmit="return confirm('Are you sure you want to delete this availability?')">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="btn btn-danger btn-sm" title="Delete">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
-                                    </div>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="9" class="text-center">No availability records found.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-
-            @if($availabilities->hasPages())
-                <div class="d-flex justify-content-center">
-                    {{ $availabilities->links() }}
                 </div>
             @endif
         </div>

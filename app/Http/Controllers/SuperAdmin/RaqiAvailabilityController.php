@@ -19,39 +19,20 @@ class RaqiAvailabilityController extends Controller
         $currentDate = Carbon::now();
         $endDate = (clone $currentDate)->addMonth();
         
-        $availabilities = RaqiMonthlyAvailability::with('practitioner')
-            ->where('availability_date', '>=', $currentDate->format('Y-m-d'))
-            ->where('availability_date', '<=', $endDate->format('Y-m-d'))
-            ->orderBy('availability_date')
-            ->orderBy('start_time')
-            ->paginate(20);
-        
-        // Get all appointments in the date range
-        $appointments = Appointment::with('practitioner')
-            ->where('appointment_date', '>=', $currentDate->format('Y-m-d'))
-            ->where('appointment_date', '<=', $endDate->format('Y-m-d'))
-            ->get()
-            ->groupBy(function($appointment) {
-                return \Carbon\Carbon::parse($appointment->appointment_date)->format('Y-m-d');
-            });
-        
         // Get all practitioners (raqis)
         $practitioners = User::where('role', 'admin')->get();
         
-        // Get statistics for summary cards (without pagination)
-        $totalAvailabilities = RaqiMonthlyAvailability::where('availability_date', '>=', $currentDate->format('Y-m-d'))
+        // Get all availabilities for statistics (without pagination)
+        $allAvailabilities = RaqiMonthlyAvailability::where('availability_date', '>=', $currentDate->format('Y-m-d'))
             ->where('availability_date', '<=', $endDate->format('Y-m-d'))
-            ->count();
-        $availableDays = RaqiMonthlyAvailability::where('availability_date', '>=', $currentDate->format('Y-m-d'))
-            ->where('availability_date', '<=', $endDate->format('Y-m-d'))
-            ->where('is_available', true)
-            ->count();
-        $unavailableDays = RaqiMonthlyAvailability::where('availability_date', '>=', $currentDate->format('Y-m-d'))
-            ->where('availability_date', '<=', $endDate->format('Y-m-d'))
-            ->where('is_available', false)
-            ->count();
+            ->get();
         
-        return view('superadmin.raqi-availability.index', compact('availabilities', 'appointments', 'currentDate', 'endDate', 'practitioners', 'totalAvailabilities', 'availableDays', 'unavailableDays'));
+        // Get statistics for summary cards
+        $totalAvailabilities = $allAvailabilities->count();
+        $availableDays = $allAvailabilities->where('is_available', true)->count();
+        $unavailableDays = $allAvailabilities->where('is_available', false)->count();
+        
+        return view('superadmin.raqi-availability.index', compact('practitioners', 'totalAvailabilities', 'availableDays', 'unavailableDays'));
     }
     
     /**
@@ -164,5 +145,57 @@ class RaqiAvailabilityController extends Controller
             ->get();
         
         return view('superadmin.raqi-availability.show', compact('availability', 'appointments'));
+    }
+
+    /**
+     * Show availability for a specific practitioner.
+     */
+    public function byPractitioner(User $practitioner)
+    {
+        $currentDate = Carbon::now();
+        $endDate = (clone $currentDate)->addMonth();
+        
+        $availabilities = RaqiMonthlyAvailability::where('practitioner_id', $practitioner->id)
+            ->where('availability_date', '>=', $currentDate->format('Y-m-d'))
+            ->where('availability_date', '<=', $endDate->format('Y-m-d'))
+            ->orderBy('availability_date')
+            ->orderBy('start_time')
+            ->paginate(20);
+        
+        // Get all appointments for this practitioner in the date range
+        $appointments = Appointment::where('practitioner_id', $practitioner->id)
+            ->where('appointment_date', '>=', $currentDate->format('Y-m-d'))
+            ->where('appointment_date', '<=', $endDate->format('Y-m-d'))
+            ->get()
+            ->groupBy(function($appointment) {
+                return \Carbon\Carbon::parse($appointment->appointment_date)->format('Y-m-d');
+            });
+        
+        // Get statistics for this practitioner
+        $totalAvailabilities = RaqiMonthlyAvailability::where('practitioner_id', $practitioner->id)
+            ->where('availability_date', '>=', $currentDate->format('Y-m-d'))
+            ->where('availability_date', '<=', $endDate->format('Y-m-d'))
+            ->count();
+        $availableDays = RaqiMonthlyAvailability::where('practitioner_id', $practitioner->id)
+            ->where('availability_date', '>=', $currentDate->format('Y-m-d'))
+            ->where('availability_date', '<=', $endDate->format('Y-m-d'))
+            ->where('is_available', true)
+            ->count();
+        $unavailableDays = RaqiMonthlyAvailability::where('practitioner_id', $practitioner->id)
+            ->where('availability_date', '>=', $currentDate->format('Y-m-d'))
+            ->where('availability_date', '<=', $endDate->format('Y-m-d'))
+            ->where('is_available', false)
+            ->count();
+        
+        return view('superadmin.raqi-availability.by-practitioner', compact(
+            'practitioner', 
+            'availabilities', 
+            'appointments', 
+            'currentDate', 
+            'endDate', 
+            'totalAvailabilities', 
+            'availableDays', 
+            'unavailableDays'
+        ));
     }
 } 

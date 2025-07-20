@@ -71,6 +71,7 @@ Route::middleware(['auth', 'checkRole:super_admin'])->prefix('superadmin')->name
     Route::resource('appointments', SuperAdminAppointmentController::class);
     Route::resource('treatments', SuperAdminTreatmentController::class);
     Route::resource('raqi-availability', SuperAdminRaqiAvailabilityController::class)->parameters(['raqi-availability' => 'availability']);
+    Route::get('raqi-availability/practitioner/{practitioner}', [SuperAdminRaqiAvailabilityController::class, 'byPractitioner'])->name('raqi-availability.by-practitioner');
     Route::resource('blogs', App\Http\Controllers\SuperAdmin\BlogController::class); // <-- Add this line
     Route::resource('categories', App\Http\Controllers\SuperAdmin\CategoryController::class);
     Route::resource('contact-information', App\Http\Controllers\SuperAdmin\ContactInformationController::class);
