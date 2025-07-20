@@ -177,16 +177,30 @@
 #availability-calendar {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 4px;
+    gap: 2px;
     min-height: 40px;
     background: white;
     border: 1px solid #dee2e6;
     border-radius: 8px;
-    padding: 8px;
+    padding: 12px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.calendar-day-header {
+    text-align: center;
+    font-weight: 600;
+    padding: 10px 4px;
+    color: #495057;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    margin-bottom: 4px;
 }
 #availability-calendar button {
-    min-width: 32px;
-    min-height: 32px;
+    min-width: 36px;
+    min-height: 36px;
     border: none;
     outline: none;
     cursor: pointer;
@@ -194,9 +208,11 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    margin: 0 auto;
+    margin: 2px auto;
     font-weight: 500;
+    font-size: 14px;
     transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 #availability-calendar button.available {
     background-color: #28a745 !important;
@@ -466,6 +482,16 @@ document.addEventListener('DOMContentLoaded', function() {
         
         monthLabel.textContent = firstDay.toLocaleString('default', { month: 'long', year: 'numeric' });
         
+        // Add day headers (Sunday, Monday, etc.)
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        dayNames.forEach(dayName => {
+            const dayHeader = document.createElement('div');
+            dayHeader.className = 'calendar-day-header';
+            dayHeader.textContent = dayName;
+            dayHeader.style.cssText = 'text-align: center; font-weight: bold; padding: 8px 4px; color: #495057; font-size: 12px; border-bottom: 1px solid #dee2e6;';
+            calendar.appendChild(dayHeader);
+        });
+        
         // Fill empty cells before first day
         for (let i = 0; i < startDay; i++) {
             const cell = document.createElement('div');
@@ -729,6 +755,16 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('Fallback: Days in month:', daysInMonth);
         console.log('Fallback: First day:', firstDay);
         
+        // Add day headers (Sunday, Monday, etc.)
+        const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+        dayNames.forEach(dayName => {
+            const dayHeader = document.createElement('div');
+            dayHeader.className = 'calendar-day-header';
+            dayHeader.textContent = dayName;
+            dayHeader.style.cssText = 'text-align: center; font-weight: 600; padding: 10px 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #f8f9fa; border-bottom: 2px solid #dee2e6; margin-bottom: 4px;';
+            calendar.appendChild(dayHeader);
+        });
+        
         // Add empty cells for days before the first day
         for (let i = 0; i < firstDay; i++) {
             const emptyCell = document.createElement('div');
@@ -741,7 +777,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const dayButton = document.createElement('button');
             dayButton.type = 'button';
             dayButton.textContent = d;
-            dayButton.style.cssText = 'width: 32px; height: 32px; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 500; cursor: pointer; transition: all 0.2s; margin: 0; padding: 0; font-size: 12px;';
+            dayButton.style.cssText = 'width: 36px; height: 36px; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 500; cursor: pointer; transition: all 0.2s; margin: 2px auto; padding: 0; font-size: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);';
             
             const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
             dayButton.setAttribute('data-date', dateStr);
