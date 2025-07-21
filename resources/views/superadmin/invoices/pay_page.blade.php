@@ -9,22 +9,30 @@
                     <h3>Pay Invoice #{{ $invoice->invoice_no }}</h3>
                 </div>
                 <div class="card-body">
-                    <div class="row mb-4">
-                        <div class="col-md-6">
-                            <h5>Patient Information</h5>
-                            <p><strong>Appointment No:</strong> {{ $invoice->appointment->appointment_no }}</p>
-                            <p><strong>Name:</strong> {{ $invoice->patient->name }}</p>
-                            <p><strong>Email:</strong> {{ $invoice->patient->email }}</p>
-                            <p><strong>Phone:</strong> {{ $invoice->patient->phone }}</p>
-                        </div>
-                        <div class="col-md-6">
-                            <h5>Practitioner Information</h5>
-                            <p><strong>Name:</strong> {{ $invoice->practitioner->name }}</p>
-                            <p><strong>Email:</strong> {{ $invoice->practitioner->email }}</p>
-                            <p><strong>Phone:</strong> {{ $invoice->practitioner->phone }}</p>
-                        </div>
+                    <div class="mb-3">
+                        <a class="btn btn-outline-info" data-toggle="collapse" href="#patientInfoCollapse" role="button" aria-expanded="false" aria-controls="patientInfoCollapse">
+                            Show/Hide Patient & Practitioner Details <i class="fas fa-chevron-down ml-2"></i>
+                        </a>
                     </div>
-                    <hr>
+                    <div class="collapse" id="patientInfoCollapse">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <h5>Patient Information</h5>
+                                <p><strong>Appointment No:</strong> {{ $invoice->appointment->appointment_no }}</p>
+                                <p><strong>Name:</strong> {{ $invoice->patient->name }}</p>
+                                <p><strong>Email:</strong> {{ $invoice->patient->email }}</p>
+                                <p><strong>Phone:</strong> {{ $invoice->patient->phone }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Practitioner Information</h5>
+                                <p><strong>Name:</strong> {{ $invoice->practitioner->name }}</p>
+                                <p><strong>Email:</strong> {{ $invoice->practitioner->email }}</p>
+                                <p><strong>Phone:</strong> {{ $invoice->practitioner->phone }}</p>
+                            </div>
+                        </div>
+                        <hr>
+                    </div>
+
                     <form id="payForm" method="POST" action="{{ route('superadmin.invoices.storePayment', $invoice) }}">
                         @csrf
                         @if($invoice->appointment->type === 'ruqyah')
@@ -138,6 +146,32 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById(id)?.addEventListener('input', updateHijamaTotal);
     });
 
+    // Toggle icon for collapsible section
+    var collapseElement = document.getElementById('patientInfoCollapse');
+    var collapseButtonIcon = document.querySelector('a[href="#patientInfoCollapse"] i');
+
+    if (collapseElement && collapseButtonIcon) {
+        // Use jQuery for Bootstrap events if available, otherwise vanilla JS
+        if (typeof(jQuery) !== 'undefined') {
+            $('#patientInfoCollapse').on('show.bs.collapse', function () {
+                collapseButtonIcon.classList.remove('fa-chevron-down');
+                collapseButtonIcon.classList.add('fa-chevron-up');
+            });
+            $('#patientInfoCollapse').on('hide.bs.collapse', function () {
+                collapseButtonIcon.classList.remove('fa-chevron-up');
+                collapseButtonIcon.classList.add('fa-chevron-down');
+            });
+        } else {
+            collapseElement.addEventListener('show.bs.collapse', function () {
+                collapseButtonIcon.classList.remove('fa-chevron-down');
+                collapseButtonIcon.classList.add('fa-chevron-up');
+            });
+            collapseElement.addEventListener('hide.bs.collapse', function () {
+                collapseButtonIcon.classList.remove('fa-chevron-up');
+                collapseButtonIcon.classList.add('fa-chevron-down');
+            });
+        }
+    }
 });
 </script>
 @endsection 

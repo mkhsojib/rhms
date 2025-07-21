@@ -14,6 +14,11 @@
             <i class="fas fa-credit-card"></i> Pay Now
         </a>
         @endif
+        @if($invoice->transactions->isNotEmpty())
+            <a href="{{ route('superadmin.transactions.index', ['invoice_id' => $invoice->id]) }}" class="btn btn-info mx-2">
+                <i class="fas fa-eye"></i> View Transaction
+            </a>
+        @endif
     </div>
     @include('superadmin.invoices._pay_modal', ['invoice' => $invoice])
     <div class="card">

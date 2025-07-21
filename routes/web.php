@@ -141,6 +141,8 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->name('admin.')-
     Route::resource('invoices', App\Http\Controllers\Admin\InvoiceController::class)->only(['index', 'show']);
     Route::get('invoices/{invoice}/print', [App\Http\Controllers\Admin\InvoiceController::class, 'print'])->name('invoices.print');
     Route::get('invoices/{invoice}/download', [App\Http\Controllers\Admin\InvoiceController::class, 'download'])->name('invoices.download');
+    Route::get('invoices/{invoice}/pay-page', [App\Http\Controllers\Admin\InvoiceController::class, 'payPage'])->name('invoices.payPage');
+    Route::post('invoices/{invoice}/pay', [App\Http\Controllers\Admin\InvoiceController::class, 'storePayment'])->name('invoices.storePayment');
 });
 
 Route::post('/patient/appointments/get-available-time-slots', [App\Http\Controllers\Patient\AppointmentController::class, 'getAvailableTimeSlots'])->name('patient.appointments.getAvailableTimeSlots');

@@ -38,4 +38,10 @@ class Invoice extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
+
+    public function transactions()
+    {
+        return $this->hasManyThrough(Transaction::class, Payment::class, 'invoice_id', 'related_id', 'id', 'id')
+            ->where('related_to', 'payment');
+    }
 } 
