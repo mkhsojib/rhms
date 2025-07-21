@@ -50,6 +50,10 @@
             <input type="text" name="handled_by" class="form-control">
         </div>
         <div class="form-group">
+            <label>Description</label>
+            <textarea name="description" class="form-control"></textarea>
+        </div>
+        <div class="form-group">
             <label>Notes</label>
             <textarea name="notes" class="form-control"></textarea>
         </div>

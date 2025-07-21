@@ -75,6 +75,7 @@ class CashFlowController extends Controller
                 'notes' => $data['notes'] ?? null,
                 'transaction_no' => $data['transaction_no'],
                 'created_by' => $data['created_by'],
+                'description' => $data['description'] ?? null,
             ]);
             // Save to cash_flows table
             \DB::table('cash_flows')->insert([
@@ -144,6 +145,7 @@ class CashFlowController extends Controller
                 'notes' => $data['notes'] ?? null,
                 'transaction_no' => $data['transaction_no'],
                 'created_by' => $data['created_by'],
+                'description' => $data['description'] ?? null,
             ]);
             // Save to cash_flows table
             \DB::table('cash_flows')->insert([

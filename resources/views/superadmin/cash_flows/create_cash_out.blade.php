@@ -57,6 +57,10 @@
             <label>Notes</label>
             <textarea name="notes" class="form-control"></textarea>
         </div>
+        <div class="form-group">
+            <label>Description</label>
+            <textarea name="description" class="form-control"></textarea>
+        </div>
         <button type="submit" class="btn btn-danger">Save</button>
         <a href="{{ route('superadmin.cash-flows.index') }}" class="btn btn-secondary">Cancel</a>
     </form>

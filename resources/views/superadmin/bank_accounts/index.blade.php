@@ -40,6 +40,7 @@
                                 @method('DELETE')
                                 <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
                             </form>
+                            <a href="{{ route('superadmin.transactions.index', ['bank_account_id' => $account->id]) }}" class="btn btn-sm btn-info">View Transactions</a>
                         </td>
                     </tr>
                 @endforeach

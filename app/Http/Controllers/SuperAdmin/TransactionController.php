@@ -65,4 +65,23 @@ class TransactionController extends Controller
         $bankAccounts = \App\Models\BankAccount::all();
         return view('superadmin.transactions.index', compact('transactions', 'bankAccounts'));
     }
+
+    public function void($id)
+    {
+        $transaction = Transaction::findOrFail($id);
+        if ($transaction->voided_at) {
+            return redirect()->back()->with('error', 'Transaction already voided.');
+        }
+        $bank = $transaction->bankAccount;
+        // Revert the amount
+        if ($transaction->transaction_type === 'cash_in' || $transaction->transaction_type === 'deposit' || $transaction->transaction_type === 'payment') {
+            $bank->current_balance -= $transaction->amount;
+        } elseif ($transaction->transaction_type === 'cash_out' || $transaction->transaction_type === 'withdrawal') {
+            $bank->current_balance += $transaction->amount;
+        }
+        $bank->save();
+        $transaction->voided_at = now();
+        $transaction->save();
+        return redirect()->back()->with('success', 'Transaction voided and amount reverted.');
+    }
 } 

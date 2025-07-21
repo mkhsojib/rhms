@@ -49,11 +49,12 @@
                         <th>Category/Service</th>
                         <th>Description</th>
                         <th>Created By</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                 @foreach($transactions as $i => $txn)
-                    <tr @if($txn->transaction_type == 'cash_in') style="background-color:#e6ffe6;" @elseif($txn->transaction_type == 'cash_out') style="background-color:#ffe6e6;" @endif>
+                    <tr @if($txn->voided_at) style="background-color:#eee;text-decoration:line-through;" @elseif($txn->transaction_type == 'cash_in') style="background-color:#e6ffe6;" @elseif($txn->transaction_type == 'cash_out') style="background-color:#ffe6e6;" @endif>
                         <td>{{ $transactions->firstItem() + $i }}</td>
                         <td>{{ $txn->transaction_no }}</td>
                         <td>{{ $txn->transaction_date ? $txn->transaction_date->format('Y-m-d') : '' }}</td>
@@ -72,6 +73,16 @@
                         </td>
                         <td>{{ $txn->description }}</td>
                         <td>{{ $txn->creator ? $txn->creator->name : '' }}</td>
+                        <td>
+                            @if($txn->voided_at)
+                                <span class="text-danger">Voided</span>
+                            @else
+                                <form action="{{ route('superadmin.transactions.void', $txn->id) }}" method="POST" style="display:inline-block;">
+                                    @csrf
+                                    <button type="submit" class="btn btn-sm btn-secondary" onclick="return confirm('Are you sure you want to void this transaction?')">Void</button>
+                                </form>
+                            @endif
+                        </td>
                     </tr>
                 @endforeach
                 </tbody>

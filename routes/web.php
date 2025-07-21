@@ -97,6 +97,7 @@ Route::middleware(['auth', 'checkRole:super_admin'])->prefix('superadmin')->name
     Route::get('transactions/create', [App\Http\Controllers\SuperAdmin\TransactionController::class, 'create'])->name('transactions.create');
     Route::post('transactions', [App\Http\Controllers\SuperAdmin\TransactionController::class, 'store'])->name('transactions.store');
     Route::get('transactions', [App\Http\Controllers\SuperAdmin\TransactionController::class, 'index'])->name('transactions.index');
+    Route::post('transactions/{id}/void', [App\Http\Controllers\SuperAdmin\TransactionController::class, 'void'])->name('transactions.void');
 });
 
 // SuperAdmin Appointment AJAX endpoints
