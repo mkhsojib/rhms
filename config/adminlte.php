@@ -553,6 +553,24 @@ return [
             'icon' => 'fas fa-fw fa-lock',
             'can' => 'admin-profile',
         ],
+        [
+            'text' => 'Bank Accounts',
+            'url'  => 'superadmin/bank-accounts',
+            'icon' => 'fas fa-university',
+            'can'  => 'super_admin',
+        ],
+        [
+            'text' => 'Cash In/Out',
+            'url'  => 'superadmin/cash-flows',
+            'icon' => 'fas fa-exchange-alt',
+            'can'  => 'super_admin',
+        ],
+        [
+            'text' => 'Transactions',
+            'url'  => 'superadmin/transactions',
+            'icon' => 'fas fa-exchange-alt',
+            'can'  => 'super_admin',
+        ],
     ],
 
     /*

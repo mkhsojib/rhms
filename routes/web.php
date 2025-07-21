@@ -94,6 +94,9 @@ Route::middleware(['auth', 'checkRole:super_admin'])->prefix('superadmin')->name
     Route::post('settings/system', [SuperAdminSettingController::class, 'updateSystem'])->name('settings.system.update');
     Route::get('settings/business', [SuperAdminSettingController::class, 'business'])->name('settings.business');
     Route::post('settings/business', [SuperAdminSettingController::class, 'updateBusiness'])->name('settings.business.update');
+    Route::get('transactions/create', [App\Http\Controllers\SuperAdmin\TransactionController::class, 'create'])->name('transactions.create');
+    Route::post('transactions', [App\Http\Controllers\SuperAdmin\TransactionController::class, 'store'])->name('transactions.store');
+    Route::get('transactions', [App\Http\Controllers\SuperAdmin\TransactionController::class, 'index'])->name('transactions.index');
 });
 
 // SuperAdmin Appointment AJAX endpoints
@@ -101,6 +104,19 @@ Route::prefix('superadmin/appointments')->name('superadmin.appointments.')->grou
     Route::post('get-session-types', [\App\Http\Controllers\SuperAdmin\AppointmentController::class, 'getSessionTypes'])->name('getSessionTypes');
     Route::post('get-available-dates', [\App\Http\Controllers\SuperAdmin\AppointmentController::class, 'getAvailableDates'])->name('getAvailableDates');
     Route::post('get-available-times', [\App\Http\Controllers\SuperAdmin\AppointmentController::class, 'getAvailableTimes'])->name('getAvailableTimes');
+});
+
+// SuperAdmin Bank Accounts
+Route::middleware(['auth', 'can:super_admin'])->prefix('superadmin')->name('superadmin.')->group(function () {
+    Route::resource('bank-accounts', App\Http\Controllers\SuperAdmin\BankAccountController::class);
+    Route::get('cash-flows', [App\Http\Controllers\SuperAdmin\CashFlowController::class, 'index'])->name('cash-flows.index');
+    Route::get('cash-flows/cash-in/create', [App\Http\Controllers\SuperAdmin\CashFlowController::class, 'createCashIn'])->name('cash-flows.createCashIn');
+    Route::post('cash-flows/cash-in', [App\Http\Controllers\SuperAdmin\CashFlowController::class, 'storeCashIn'])->name('cash-flows.storeCashIn');
+    Route::get('cash-flows/cash-out/create', [App\Http\Controllers\SuperAdmin\CashFlowController::class, 'createCashOut'])->name('cash-flows.createCashOut');
+    Route::post('cash-flows/cash-out', [App\Http\Controllers\SuperAdmin\CashFlowController::class, 'storeCashOut'])->name('cash-flows.storeCashOut');
+    Route::get('cash-flows/{cashFlow}/edit', [App\Http\Controllers\SuperAdmin\CashFlowController::class, 'edit'])->name('cash-flows.edit');
+    Route::put('cash-flows/{cashFlow}', [App\Http\Controllers\SuperAdmin\CashFlowController::class, 'update'])->name('cash-flows.update');
+    Route::delete('cash-flows/{cashFlow}', [App\Http\Controllers\SuperAdmin\CashFlowController::class, 'destroy'])->name('cash-flows.destroy');
 });
 
 // Admin (Raqi/Hijama Practitioner) Routes
