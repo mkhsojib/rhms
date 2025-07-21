@@ -8,20 +8,10 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('transactions', function (Blueprint $table) {
-            $table->string('transaction_no')->nullable()->after('reference_number');
-            $table->string('customer_name')->nullable()->after('transaction_no');
-            $table->string('service_type')->nullable()->after('customer_name');
-            $table->string('category')->nullable()->after('service_type');
-            $table->string('paid_to')->nullable()->after('category');
-            $table->string('handled_by')->nullable()->after('paid_to');
-            $table->text('notes')->nullable()->after('handled_by');
-        });
+        // This migration is now empty because these columns are already in the original create_transactions_table migration.
     }
     public function down(): void
     {
-        Schema::table('transactions', function (Blueprint $table) {
-            $table->dropColumn(['transaction_no', 'customer_name', 'service_type', 'category', 'paid_to', 'handled_by', 'notes']);
-        });
+        // This migration is now empty because these columns are already in the original create_transactions_table migration.
     }
 }; 
