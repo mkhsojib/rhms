@@ -9,10 +9,13 @@
         <a href="{{ route('superadmin.invoices.download', $invoice) }}" class="btn btn-success mx-2" target="_blank">
             <i class="fas fa-file-pdf"></i> Download PDF
         </a>
-        <a href="#" class="btn btn-warning mx-2">
+        @if($invoice->status !== 'paid')
+        <a href="{{ route('superadmin.invoices.payPage', $invoice) }}" class="btn btn-warning mx-2">
             <i class="fas fa-credit-card"></i> Pay Now
         </a>
+        @endif
     </div>
+    @include('superadmin.invoices._pay_modal', ['invoice' => $invoice])
     <div class="card">
         <div class="card-header">
             <h3 class="card-title">Invoice Details</h3>

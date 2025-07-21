@@ -74,6 +74,9 @@
                         <td>{{ $txn->description }}</td>
                         <td>{{ $txn->creator ? $txn->creator->name : '' }}</td>
                         <td>
+                            @if($txn->invoice)
+                                <a href="{{ route('superadmin.invoices.payPage', $txn->invoice) }}" class="btn btn-sm btn-warning">Pay Now</a>
+                            @endif
                             @if($txn->voided_at)
                                 <span class="text-danger">Voided</span>
                             @else

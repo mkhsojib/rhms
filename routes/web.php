@@ -101,6 +101,9 @@ Route::middleware(['auth', 'checkRole:super_admin'])->prefix('superadmin')->name
     Route::resource('invoices', App\Http\Controllers\SuperAdmin\InvoiceController::class)->only(['index', 'show']);
     Route::get('invoices/{invoice}/print', [App\Http\Controllers\SuperAdmin\InvoiceController::class, 'print'])->name('invoices.print');
     Route::get('invoices/{invoice}/download', [App\Http\Controllers\SuperAdmin\InvoiceController::class, 'download'])->name('invoices.download');
+    Route::get('invoices/{invoice}/pay', [App\Http\Controllers\SuperAdmin\InvoiceController::class, 'pay'])->name('invoices.pay');
+    Route::post('invoices/{invoice}/pay', [App\Http\Controllers\SuperAdmin\InvoiceController::class, 'storePayment'])->name('invoices.storePayment');
+    Route::get('invoices/{invoice}/pay-page', [App\Http\Controllers\SuperAdmin\InvoiceController::class, 'payPage'])->name('invoices.payPage');
 });
 
 // SuperAdmin Appointment AJAX endpoints
