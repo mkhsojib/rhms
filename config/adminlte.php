@@ -539,6 +539,19 @@ return [
             ],
         ],
 
+        [
+            'text' => 'Invoices',
+            'url'  => 'superadmin/invoices',
+            'icon' => 'fas fa-file-invoice',
+            'can'  => 'super_admin',
+        ],
+        [
+            'text' => 'Invoices',
+            'url'  => 'admin/invoices',
+            'icon' => 'fas fa-file-invoice',
+            'can'  => 'admin',
+        ],
+
         // Account Settings
         ['header' => 'Account Settings'],
         [

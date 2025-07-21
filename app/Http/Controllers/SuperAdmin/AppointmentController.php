@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Services\NotificationService;
 use Illuminate\Http\Request;
 use App\Models\RaqiSessionType;
+use App\Models\Invoice;
 
 class AppointmentController extends Controller
 {
@@ -126,6 +127,18 @@ class AppointmentController extends Controller
             'symptoms' => $request->symptoms,
             'notes' => $request->notes,
             'status' => 'pending',
+            'created_by' => auth()->id(),
+        ]);
+
+        // Create invoice after appointment
+        $invoiceNo = 'INV-' . date('Ymd') . '-' . rand(1000, 9999);
+        Invoice::create([
+            'invoice_no' => $invoiceNo,
+            'appointment_id' => $appointment->id,
+            'patient_id' => $appointment->user_id,
+            'practitioner_id' => $appointment->practitioner_id,
+            'amount' => $appointment->session_type_fee ?? 0,
+            'status' => 'unpaid',
             'created_by' => auth()->id(),
         ]);
 

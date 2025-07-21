@@ -122,6 +122,18 @@ class AppointmentController extends Controller
             'created_by' => $user->id,
         ]);
 
+        // Create invoice after appointment
+        $invoiceNo = 'INV-' . date('Ymd') . '-' . rand(1000, 9999);
+        \App\Models\Invoice::create([
+            'invoice_no' => $invoiceNo,
+            'appointment_id' => $appointment->id,
+            'patient_id' => $appointment->user_id,
+            'practitioner_id' => $appointment->practitioner_id,
+            'amount' => $appointment->session_type_fee ?? 0,
+            'status' => 'unpaid',
+            'created_by' => $user->id,
+        ]);
+
         return redirect()->route('patient.appointments.show', $appointment)
             ->with('success', 'Appointment booked successfully. Please wait for approval.');
     }

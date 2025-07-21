@@ -193,6 +193,19 @@
                     </div>
                 </div>
                 @endif
+                @if($appointment->invoice)
+                    <div class="mb-4 d-flex justify-content-center">
+                        <a href="{{ route('superadmin.invoices.print', $appointment->invoice) }}" class="btn btn-primary mx-2" target="_blank">
+                            <i class="fas fa-print"></i> Print Invoice
+                        </a>
+                        <a href="{{ route('superadmin.invoices.download', $appointment->invoice) }}" class="btn btn-success mx-2" target="_blank">
+                            <i class="fas fa-file-pdf"></i> Download PDF
+                        </a>
+                        <a href="#" class="btn btn-warning mx-2">
+                            <i class="fas fa-credit-card"></i> Pay Now
+                        </a>
+                    </div>
+                @endif
             </div>
         </div>
     </div>

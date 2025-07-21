@@ -98,6 +98,9 @@ Route::middleware(['auth', 'checkRole:super_admin'])->prefix('superadmin')->name
     Route::post('transactions', [App\Http\Controllers\SuperAdmin\TransactionController::class, 'store'])->name('transactions.store');
     Route::get('transactions', [App\Http\Controllers\SuperAdmin\TransactionController::class, 'index'])->name('transactions.index');
     Route::post('transactions/{id}/void', [App\Http\Controllers\SuperAdmin\TransactionController::class, 'void'])->name('transactions.void');
+    Route::resource('invoices', App\Http\Controllers\SuperAdmin\InvoiceController::class)->only(['index', 'show']);
+    Route::get('invoices/{invoice}/print', [App\Http\Controllers\SuperAdmin\InvoiceController::class, 'print'])->name('invoices.print');
+    Route::get('invoices/{invoice}/download', [App\Http\Controllers\SuperAdmin\InvoiceController::class, 'download'])->name('invoices.download');
 });
 
 // SuperAdmin Appointment AJAX endpoints
@@ -132,6 +135,9 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->name('admin.')-
     // Raqi Availability Routes
     Route::resource('availability', 'App\Http\Controllers\Admin\RaqiAvailabilityController');
     Route::get('availability/get-available-time-slots', ['App\Http\Controllers\Admin\RaqiAvailabilityController', 'getAvailableTimeSlots'])->name('availability.getAvailableTimeSlots');
+    Route::resource('invoices', App\Http\Controllers\Admin\InvoiceController::class)->only(['index', 'show']);
+    Route::get('invoices/{invoice}/print', [App\Http\Controllers\Admin\InvoiceController::class, 'print'])->name('invoices.print');
+    Route::get('invoices/{invoice}/download', [App\Http\Controllers\Admin\InvoiceController::class, 'download'])->name('invoices.download');
 });
 
 Route::post('/patient/appointments/get-available-time-slots', [App\Http\Controllers\Patient\AppointmentController::class, 'getAvailableTimeSlots'])->name('patient.appointments.getAvailableTimeSlots');
