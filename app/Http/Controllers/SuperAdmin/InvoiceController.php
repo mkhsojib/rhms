@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\BankAccount;
 use App\Models\Transaction;
+use Illuminate\Validation\Rule;
 
 class InvoiceController extends Controller
 {
@@ -62,16 +63,31 @@ class InvoiceController extends Controller
             'discount' => 'nullable|numeric|min:0',
             'paid_amount' => 'required|numeric|min:0',
             'payment_method' => 'required|string',
-            'bank_account_id' => 'nullable|exists:bank_accounts,id',
+            'bank_account_id' => [
+                'nullable',
+                'exists:bank_accounts,id',
+                Rule::requiredIf(function () use ($request) {
+                    return $request->input('payment_method') !== 'cash';
+                }),
+            ],
         ]);
         DB::transaction(function () use ($request, $invoice) {
+            $paymentMethod = $request->payment_method;
+            $transactionType = 'payment';
+            $paymentMethodForTransaction = $paymentMethod;
+
+            if ($paymentMethod === 'cash_in') {
+                $transactionType = 'cash_in';
+                $paymentMethodForTransaction = 'cash';
+            }
+
             $payment = Payment::create([
                 'invoice_id' => $invoice->id,
                 'appointment_id' => $invoice->appointment_id,
                 'amount' => $request->amount,
                 'discount' => $request->discount ?? 0,
                 'paid_amount' => $request->paid_amount,
-                'payment_method' => $request->payment_method,
+                'payment_method' => $paymentMethod,
                 'bank_account_id' => $request->bank_account_id,
                 'paid_by' => Auth::id(),
                 'paid_at' => now(),
@@ -89,8 +105,8 @@ class InvoiceController extends Controller
             Transaction::create([
                 'transaction_date' => now()->toDateString(),
                 'amount' => $request->paid_amount,
-                'transaction_type' => $request->payment_method === 'cash_in' ? 'cash_in' : 'payment',
-                'payment_method' => $request->payment_method,
+                'transaction_type' => $transactionType,
+                'payment_method' => $paymentMethodForTransaction,
                 'bank_account_id' => $request->bank_account_id,
                 'description' => 'Payment for Invoice #' . $invoice->invoice_no,
                 'transaction_no' => 'TXN-' . date('Ymd') . '-' . rand(1000, 9999),
