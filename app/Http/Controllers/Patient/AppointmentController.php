@@ -271,6 +271,8 @@ class AppointmentController extends Controller
                 'practitioner_id' => 'required|exists:users,id',
                 'type' => 'required|in:ruqyah,hijama',
                 'appointment_date' => 'required|date',
+                'appointment_time' => 'required',
+                'appointment_end_time' => 'required|date_format:H:i',
                 'symptoms' => 'nullable|string',
             ]);
             

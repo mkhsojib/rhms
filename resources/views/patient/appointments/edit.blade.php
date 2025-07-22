@@ -137,6 +137,7 @@
                                     <!-- Time slots will be dynamically generated here -->
                                 </div>
                                 <input type="hidden" id="appointment_time" name="appointment_time" value="{{ old('appointment_time', substr($appointment->appointment_time, 0, 5)) }}" required>
+                                <input type="hidden" id="appointment_end_time" name="appointment_end_time" value="{{ old('appointment_end_time', $appointment->appointment_end_time ? substr($appointment->appointment_end_time, 0, 5) : '') }}" required>
                             </div>
                             @error('appointment_time')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -538,6 +539,7 @@ document.addEventListener('DOMContentLoaded', function() {
             formData.append('symptoms', symptoms);
             formData.append('appointment_date', appointmentDate);
             formData.append('appointment_time', appointmentTime);
+            formData.append('appointment_end_time', document.getElementById('appointment_end_time').value);
             
             // Submit the form via AJAX
             fetch(form.action, {
@@ -1078,8 +1080,26 @@ function updateSelectedTimeSlots() {
         selectedSlots.push(el.dataset.time);
     });
     
+    // Update appointment_time with selected time slots
     document.getElementById('appointment_time').value = selectedSlots.join(',');
     console.log('Selected time slots:', selectedSlots);
+    
+    // If we have at least one selected slot, calculate the end time for the first slot
+    // This is needed for the hidden appointment_end_time field
+    if (selectedSlots.length > 0) {
+        const timeStr = selectedSlots[0];
+        // Calculate end time (1 hour after start time)
+        const [hour, minute] = timeStr.split(':').map(Number);
+        const endHour = (hour + 1) % 24;
+        const endTimeStr = `${String(endHour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+        
+        // Set the hidden appointment_end_time field
+        const endTimeInput = document.getElementById('appointment_end_time');
+        if (endTimeInput) {
+            endTimeInput.value = endTimeStr;
+            console.log('End time calculated:', endTimeStr);
+        }
+    }
 }
 
 function formatTimeDisplay(timeStr) {
@@ -1125,4 +1145,4 @@ function showTimeSlotsMessage(message) {
     messageEl.querySelector('p').textContent = message;
 }
 </script>
-@endsection 
+@endsection
