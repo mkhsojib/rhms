@@ -97,11 +97,11 @@
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row" id="session-type-row">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="session_type_id">Session Type *</label>
-                            <select name="session_type_id" id="session_type_id" class="form-control @error('session_type_id') is-invalid @enderror" required>
+                            <select name="session_type_id" id="session_type_id" class="form-control @error('session_type_id') is-invalid @enderror">
                                 <option value="">Select Session Type</option>
                                 @foreach($sessionTypes as $stype)
                                     <option value="{{ $stype->id }}" 
@@ -599,11 +599,33 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
         }
     });
+    
+    // Session Type field visibility logic
+    function handleSessionTypeVisibility() {
+        const appointmentType = '{{ $appointment->type }}';
+        const sessionTypeRow = document.getElementById('session-type-row');
+        const sessionTypeSelect = document.getElementById('session_type_id');
+        
+        if (appointmentType === 'hijama') {
+            sessionTypeRow.style.display = 'none';
+            sessionTypeSelect.removeAttribute('required');
+        } else if (appointmentType === 'ruqyah') {
+            sessionTypeRow.style.display = 'block';
+            sessionTypeSelect.setAttribute('required', 'required');
+        } else {
+            sessionTypeRow.style.display = 'none';
+            sessionTypeSelect.removeAttribute('required');
+        }
+    }
+    
     // Initial render
     renderAvailableDates();
     if (selectedDate) {
         loadAvailableTimesForDate(selectedDate);
     }
+    
+    // Set initial session type field visibility
+    handleSessionTypeVisibility();
 });
 </script>
 @stop
