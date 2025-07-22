@@ -81,16 +81,16 @@
                             </div>
 
                             <div id="availability-calendar" style="border: 2px solid #007bff; background: #f8f9fa; padding: 0; width: 100%; min-height: 200px;">
-                                <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 8px;">
-                                    <div style="text-align: center; font-weight: 600; padding: 8px 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px;">Sun</div>
-                                    <div style="text-align: center; font-weight: 600; padding: 8px 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px;">Mon</div>
-                                    <div style="text-align: center; font-weight: 600; padding: 8px 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px;">Tue</div>
-                                    <div style="text-align: center; font-weight: 600; padding: 8px 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px;">Wed</div>
-                                    <div style="text-align: center; font-weight: 600; padding: 8px 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px;">Thu</div>
-                                    <div style="text-align: center; font-weight: 600; padding: 8px 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px;">Fri</div>
-                                    <div style="text-align: center; font-weight: 600; padding: 8px 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px;">Sat</div>
+                                <div class="calendar-header" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 8px; text-align: center;">
+                                    <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Sun</div>
+                                    <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Mon</div>
+                                    <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Tue</div>
+                                    <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Wed</div>
+                                    <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Thu</div>
+                                    <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Fri</div>
+                                    <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Sat</div>
                                 </div>
-                                <div id="calendar-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 0 8px 8px 8px;"></div>
+                                <div id="calendar-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 0 8px 8px 8px; text-align: center;"></div>
                             </div>
                             <input type="hidden" name="appointment_date" id="appointment_date" value="{{ old('appointment_date', $appointment->appointment_date ? \Carbon\Carbon::parse($appointment->appointment_date)->format('Y-m-d') : '' ) }}" required>
                             @error('appointment_date')
@@ -119,11 +119,7 @@
                             <label for="session_type_id">Session Type *</label>
                             <select name="session_type_id" id="session_type_id" class="form-control @error('session_type_id') is-invalid @enderror" required>
                                 <option value="">Select Session Type</option>
-                                @foreach($sessionTypes as $stype)
-                                    <option value="{{ $stype->id }}" data-practitioner="{{ $stype->practitioner_id }}" data-fee="{{ $stype->fee }}" data-min="{{ $stype->min_duration }}" data-max="{{ $stype->max_duration }}" {{ old('session_type_id', $appointment->session_type_id) == $stype->id ? 'selected' : '' }}>
-                                        {{ ucfirst($stype->type) }} (Fee: {{ $stype->fee }}, Duration: {{ $stype->min_duration }}-{{ $stype->max_duration }} min)
-                                    </option>
-                                @endforeach
+                                <!-- Session types will be populated via JavaScript -->
                             </select>
                             @error('session_type_id')
                                 <span class="invalid-feedback">{{ $message }}</span>
@@ -262,21 +258,43 @@
 @section('js')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Debug output
+    console.log('DOM Content Loaded');
+    
+    // Check if elements exist
+    console.log('Calendar grid exists:', document.getElementById('calendar-grid') !== null);
+    console.log('Session type select exists:', document.getElementById('session_type_id') !== null);
+    
     const availableDatesObj = @json($availableDates ?? []);
+    console.log('Available dates:', availableDatesObj);
+    
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
     let lastSelectedDate = '{{ old('appointment_date', $appointment->appointment_date ? \Carbon\Carbon::parse($appointment->appointment_date)->format('Y-m-d') : '' ) }}';
     let selectedPractitionerId = '{{ old('practitioner_id', $appointment->practitioner_id) }}';
     let selectedTime = '{{ old('appointment_time', $appointment->appointment_time ? \Carbon\Carbon::parse($appointment->appointment_time)->format('H:i') : '' ) }}';
     
+    console.log('Initial values:', {
+        currentMonth,
+        currentYear,
+        lastSelectedDate,
+        selectedPractitionerId,
+        selectedTime
+    });
+    
     // Get DOM elements
     const typeSelect = document.getElementById('type');
     const practitionerSelect = document.getElementById('practitioner_id');
     const allPractitionerOptions = Array.from(practitionerSelect.options);
     
-    // Store all session types for each practitioner
-    const allSessionTypes = @json($sessionTypes ?? []);
+    // Store all session types for JavaScript filtering
+    const allSessionTypes = @json($sessionTypesForJs ?? []);
+    console.log('All session types:', allSessionTypes);
+    
     const sessionTypeSelect = document.getElementById('session_type_id');
+    if (!sessionTypeSelect) {
+        console.error('Session type select not found');
+    }
     
     function filterPractitioners() {
         const selectedType = typeSelect.value;
@@ -309,13 +327,19 @@ document.addEventListener('DOMContentLoaded', function() {
         defaultOption.textContent = 'Select Session Type';
         sessionTypeSelect.appendChild(defaultOption);
         
-        if (!practitionerId || !allSessionTypes) return;
+        if (!practitionerId || !allSessionTypes || allSessionTypes.length === 0) {
+            console.log('No session types available or practitioner not selected');
+            return;
+        }
         
         // Get selected treatment type
         const selectedType = typeSelect.value;
+        console.log('Selected treatment type:', selectedType);
         
-        // Get session types for this practitioner (data is grouped by practitioner_id)
-        const practitionerSessionTypes = allSessionTypes[practitionerId] || [];
+        // Filter session types for this practitioner from flat array
+        const practitionerSessionTypes = allSessionTypes.filter(type => {
+            return parseInt(type.practitioner_id) === parseInt(practitionerId);
+        });
         
         console.log('Session types for practitioner:', practitionerSessionTypes);
         
@@ -327,20 +351,26 @@ document.addEventListener('DOMContentLoaded', function() {
         
         console.log('Filtered session types for practitioner and type:', filteredSessionTypes);
         
-        filteredSessionTypes.forEach(type => {
+        // If we have no session types after filtering, show all for this practitioner
+        const typesToShow = filteredSessionTypes.length > 0 ? filteredSessionTypes : practitionerSessionTypes;
+        
+        // Add session types to dropdown
+        typesToShow.forEach(type => {
             const option = document.createElement('option');
             option.value = type.id;
             option.textContent = `${type.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} - Fee: ${type.fee}`;
             
             // Select the current appointment's session type
-            if (type.id == '{{ old('session_type_id', $appointment->session_type_id) }}') {
+            const currentSessionTypeId = '{{ old("session_type_id", $appointment->session_type_id) }}';
+            if (currentSessionTypeId && parseInt(type.id) === parseInt(currentSessionTypeId)) {
                 option.selected = true;
+                console.log('Selected session type:', type.id);
             }
             
             sessionTypeSelect.appendChild(option);
         });
         
-        console.log('Session types loaded:', filteredSessionTypes.length);
+        console.log('Session types loaded:', typesToShow.length);
     }
     
     function selectDate(dateStr) {
@@ -527,13 +557,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     practitionerSelect.addEventListener('change', function() {
         selectedPractitionerId = this.value;
+        
+        // Clear and reload session types based on selected practitioner
         loadSessionTypesForPractitioner(selectedPractitionerId);
         
+        // Update calendar if practitioner is selected
         if (selectedPractitionerId) {
             renderCalendar(currentMonth, currentYear);
         } else {
             clearCalendar();
         }
+        
+        console.log('Practitioner changed to:', selectedPractitionerId);
     });
     
     // Navigation buttons
@@ -564,12 +599,55 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initial setup
     filterPractitioners();
+    
+    // Force render calendar regardless of practitioner selection
+    renderCalendar(currentMonth, currentYear);
+    
+    // Pre-select the current practitioner if it exists
     if (selectedPractitionerId) {
+        // Make sure the practitioner is selected in the dropdown
+        if (practitionerSelect.value !== selectedPractitionerId) {
+            practitionerSelect.value = selectedPractitionerId;
+        }
+        
+        // Load session types for the selected practitioner
         loadSessionTypesForPractitioner(selectedPractitionerId);
-        renderCalendar(currentMonth, currentYear);
+        
+        // Load time slots if date is selected
         if (lastSelectedDate) {
             loadTimeSlotsForDate(lastSelectedDate);
         }
+    } else {
+        // If no practitioner is selected but we have an appointment with a practitioner_id
+        const appointmentPractitionerId = '{{ $appointment->practitioner_id }}';
+        if (appointmentPractitionerId) {
+            console.log('Using appointment practitioner ID:', appointmentPractitionerId);
+            // Select the practitioner from the appointment
+            practitionerSelect.value = appointmentPractitionerId;
+            selectedPractitionerId = appointmentPractitionerId;
+            
+            // Load session types for this practitioner
+            loadSessionTypesForPractitioner(appointmentPractitionerId);
+            
+            // Load time slots if date is selected
+            if (lastSelectedDate) {
+                loadTimeSlotsForDate(lastSelectedDate);
+            }
+        }
+    }
+    
+    // Force calendar rendering again to ensure it displays
+    setTimeout(() => {
+        renderCalendar(currentMonth, currentYear);
+    }, 100);
+    
+    // Debug information
+    console.log('Initial setup complete');
+    console.log('Selected practitioner ID:', selectedPractitionerId);
+    console.log('Selected date:', lastSelectedDate);
+    console.log('Selected time:', selectedTime);
+    console.log('Session type ID:', '{{ old("session_type_id", $appointment->session_type_id) }}');
+    console.log('Available session types:', allSessionTypes);
     }
 });
 </script>

@@ -166,10 +166,11 @@ class AppointmentController extends Controller
         $patients = User::where('role', 'patient')->where('is_active', true)->get();
         $practitioners = User::where('role', 'admin')->where('is_active', true)->get();
         
-        // Get all session types grouped by practitioner
-        $sessionTypes = \App\Models\RaqiSessionType::all()->groupBy('practitioner_id')->map(function($group) {
-            return $group->toArray();
-        })->toArray();
+        // Get all session types for JavaScript (flat array)
+        $sessionTypesForJs = \App\Models\RaqiSessionType::all();
+        
+        // Get all session types for Blade template (original collection)
+        $sessionTypes = \App\Models\RaqiSessionType::all();
         
         // Build available dates for all practitioners
         $availableDates = [];
@@ -233,6 +234,7 @@ class AppointmentController extends Controller
             'patients' => $patients,
             'practitioners' => $practitioners,
             'sessionTypes' => $sessionTypes,
+            'sessionTypesForJs' => $sessionTypesForJs,
             'availableDates' => $availableDates,
             'availableTypes' => $availableTypes,
             'serverToday' => $serverToday,
