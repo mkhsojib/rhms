@@ -79,30 +79,17 @@
                                 <span id="calendar-month-label" class="mx-3 font-weight-bold"></span>
                                 <button type="button" id="next-month" class="btn btn-outline-secondary btn-sm">&gt;</button>
                             </div>
-
-                            <div class="card mb-3">
-                                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                                    <span>Calendar</span>
-                                    <div>
-                                        <button type="button" id="prev-month" class="btn btn-sm btn-light mr-2">&lt;</button>
-                                        <span id="calendar-month-label">Month Year</span>
-                                        <button type="button" id="next-month" class="btn btn-sm btn-light ml-2">&gt;</button>
-                                    </div>
+                            <div id="availability-calendar" style="border: 2px solid #007bff; background: #f8f9fa; padding: 0; width: 100%; min-height: 200px;">
+                                <div id="calendar-day-header" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 8px;">
+                                    <div style="text-align: center; font-weight: 600; padding: 8px 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px;">Sun</div>
+                                    <div style="text-align: center; font-weight: 600; padding: 8px 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px;">Mon</div>
+                                    <div style="text-align: center; font-weight: 600; padding: 8px 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px;">Tue</div>
+                                    <div style="text-align: center; font-weight: 600; padding: 8px 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px;">Wed</div>
+                                    <div style="text-align: center; font-weight: 600; padding: 8px 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px;">Thu</div>
+                                    <div style="text-align: center; font-weight: 600; padding: 8px 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px;">Fri</div>
+                                    <div style="text-align: center; font-weight: 600; padding: 8px 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px;">Sat</div>
                                 </div>
-                                <div class="card-body p-0">
-                                    <div id="availability-calendar" style="border: 2px solid #007bff; background: #f8f9fa; padding: 0; width: 100%; min-height: 200px;">
-                                        <div class="calendar-header" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 8px; text-align: center;">
-                                            <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Sun</div>
-                                            <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Mon</div>
-                                            <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Tue</div>
-                                            <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Wed</div>
-                                            <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Thu</div>
-                                            <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Fri</div>
-                                            <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Sat</div>
-                                        </div>
-                                        <div id="calendar-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 0 8px 8px 8px; text-align: center;"></div>
-                                    </div>
-                                </div>
+                                <div id="calendar-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 0 8px 8px 8px;"></div>
                             </div>
                             <input type="hidden" name="appointment_date" id="appointment_date" value="{{ old('appointment_date', $appointment->appointment_date ? \Carbon\Carbon::parse($appointment->appointment_date)->format('Y-m-d') : '' ) }}" required>
                             @error('appointment_date')
@@ -280,334 +267,168 @@
 @section('js')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Debug output
-    console.log('DOM Content Loaded');
-    
-    // Check if elements exist
-    console.log('Calendar grid exists:', document.getElementById('calendar-grid') !== null);
-    console.log('Session type select exists:', document.getElementById('session_type_id') !== null);
-    
-    const availableDatesObj = @json($availableDates ?? []);
-    console.log('Available dates:', availableDatesObj);
-    
     let currentMonth = new Date().getMonth();
     let currentYear = new Date().getFullYear();
-    let lastSelectedDate = '{{ old('appointment_date', $appointment->appointment_date ? \Carbon\Carbon::parse($appointment->appointment_date)->format('Y-m-d') : '' ) }}';
-    let selectedPractitionerId = '{{ old('practitioner_id', $appointment->practitioner_id) }}';
+    let selectedDate = '{{ old('appointment_date', $appointment->appointment_date ? \Carbon\Carbon::parse($appointment->appointment_date)->format('Y-m-d') : '' ) }}';
     let selectedTime = '{{ old('appointment_time', $appointment->appointment_time ? \Carbon\Carbon::parse($appointment->appointment_time)->format('H:i') : '' ) }}';
-    
-    console.log('Initial values:', {
-        currentMonth,
-        currentYear,
-        lastSelectedDate,
-        selectedPractitionerId,
-        selectedTime
-    });
-    
-    // Get DOM elements
-    const typeSelect = document.getElementById('type');
-    const practitionerSelect = document.getElementById('practitioner_id');
-    const allPractitionerOptions = Array.from(practitionerSelect.options);
-    
-    // Store all session types for JavaScript filtering
-    const allSessionTypes = @json($sessionTypesForJs ?? []);
-    console.log('All session types:', allSessionTypes);
-    
-    const sessionTypeSelect = document.getElementById('session_type_id');
-    if (!sessionTypeSelect) {
-        console.error('Session type select not found');
+    let selectedPractitionerId = document.getElementById('practitioner_id').value;
+    const availableDatesObj = @json($availableDates ?? []);
+
+    function updateCalendarNavigation() {
+        const monthNames = [
+            'January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'
+        ];
+        const monthLabel = document.getElementById('calendar-month-label');
+        if (monthLabel) {
+            monthLabel.textContent = `${monthNames[currentMonth]} ${currentYear}`;
+        }
     }
-    
-    function filterPractitioners() {
-        const selectedType = typeSelect.value;
-        practitionerSelect.innerHTML = '';
-        practitionerSelect.appendChild(allPractitionerOptions[0]);
-        allPractitionerOptions.slice(1).forEach(option => {
-            const specialization = option.getAttribute('data-specialization');
-            if (
-                selectedType === '' ||
-                specialization === 'both' ||
-                (selectedType === 'ruqyah' && specialization === 'ruqyah_healing') ||
-                (selectedType === 'hijama' && specialization === 'hijama_cupping')
-            ) {
-                practitionerSelect.appendChild(option);
+
+    function getAvailableDates() {
+        if (!selectedPractitionerId || !availableDatesObj[selectedPractitionerId]) return [];
+        return availableDatesObj[selectedPractitionerId].map(dateObj => dateObj.availability_date);
+    }
+
+    function getTimeSlotsForDate(date) {
+        if (!selectedPractitionerId || !availableDatesObj[selectedPractitionerId]) return [];
+        const dateObj = availableDatesObj[selectedPractitionerId].find(d => d.availability_date === date);
+        if (!dateObj) return [];
+        const startTime = dateObj.start_time;
+        const endTime = dateObj.end_time;
+        const bookedTimes = dateObj.booked_times || [];
+        const timeSlots = [];
+        const [startHour, startMin] = startTime.split(':').map(Number);
+        const [endHour, endMin] = endTime.split(':').map(Number);
+        for (let hour = startHour; hour < endHour; hour++) {
+            const timeStr = `${String(hour).padStart(2, '0')}:00`;
+            if (!bookedTimes.includes(timeStr)) {
+                timeSlots.push(timeStr);
             }
-        });
-        // Clear calendar when practitioner changes
-        clearCalendar();
-        // Clear session types when practitioner changes
-        loadSessionTypesForPractitioner(null);
+        }
+        return timeSlots;
     }
-    
-    function loadSessionTypesForPractitioner(practitionerId) {
-        console.log('Loading session types for practitioner:', practitionerId);
-        
-        if (!practitionerId) {
-            console.log('No practitioner selected');
-            // Hide all options except the default one
-            Array.from(sessionTypeSelect.options).forEach(option => {
-                if (option.value === '') {
-                    option.style.display = 'block';
+
+    function renderAvailableDates() {
+        const calendarGrid = document.getElementById('calendar-grid');
+        if (!calendarGrid) return;
+        calendarGrid.innerHTML = '';
+        updateCalendarNavigation();
+        const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+        const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+        const availableDates = getAvailableDates();
+        const totalCells = 42; // 7 days x 6 weeks
+        let day = 1;
+        for (let cell = 0; cell < totalCells; cell++) {
+            const cellDiv = document.createElement('button');
+            cellDiv.type = 'button';
+            cellDiv.style.cssText = 'width: 100%; height: 36px; border: 1px solid #dee2e6; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 700; cursor: pointer; transition: all 0.2s; margin: 2px; padding: 4px; font-size: 14px;';
+            if (cell >= firstDay && day <= daysInMonth) {
+                const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isAvailable = availableDates.includes(dateStr);
+                const isSelected = dateStr === selectedDate;
+                cellDiv.textContent = day;
+                if (!selectedPractitionerId) {
+                    cellDiv.style.backgroundColor = '#f8f9fa';
+                    cellDiv.style.color = '#adb5bd';
+                    cellDiv.disabled = true;
+                } else if (isSelected && isAvailable) {
+                    cellDiv.classList.add('selected-date');
+                    cellDiv.disabled = false;
+                    cellDiv.style.setProperty('background-color', '#007bff', 'important');
+                    cellDiv.style.setProperty('color', 'white', 'important');
+                    cellDiv.style.setProperty('border-color', '#007bff', 'important');
+                    cellDiv.onclick = function() {
+                        selectDate(dateStr);
+                        renderAvailableDates();
+                    };
+                } else if (isAvailable) {
+                    cellDiv.classList.add('available-date');
+                    cellDiv.disabled = false;
+                    cellDiv.style.setProperty('background-color', '#28a745', 'important');
+                    cellDiv.style.setProperty('color', 'white', 'important');
+                    cellDiv.style.setProperty('border-color', '#28a745', 'important');
+                    cellDiv.onclick = function() {
+                        selectDate(dateStr);
+                        renderAvailableDates();
+                    };
                 } else {
-                    option.style.display = 'none';
+                    cellDiv.style.backgroundColor = '#f8f9fa';
+                    cellDiv.style.color = '#6c757d';
+                    cellDiv.style.borderColor = '#dee2e6';
+                    cellDiv.disabled = true;
                 }
-            });
-            return;
+                day++;
+            } else {
+                cellDiv.textContent = '';
+                cellDiv.style.backgroundColor = '#f8f9fa';
+                cellDiv.style.color = '#adb5bd';
+                cellDiv.disabled = true;
+            }
+            calendarGrid.appendChild(cellDiv);
         }
-        
-        // Get selected treatment type
-        const selectedType = typeSelect.value;
-        console.log('Selected treatment type:', selectedType);
-        
-        // Show/hide options based on practitioner
-        Array.from(sessionTypeSelect.options).forEach(option => {
-            if (option.value === '') {
-                // Always show the default option
-                option.style.display = 'block';
-                return;
-            }
-            
-            const optionPractitionerId = option.getAttribute('data-practitioner');
-            
-            // Check if this option belongs to the selected practitioner
-            const matchesPractitioner = optionPractitionerId && 
-                parseInt(optionPractitionerId) === parseInt(practitionerId);
-            
-            // If treatment type is selected, also filter by that
-            let matchesTreatmentType = true;
-            if (selectedType && option.textContent) {
-                matchesTreatmentType = option.textContent.toLowerCase().includes(selectedType.toLowerCase());
-            }
-            
-            // Show or hide based on filters
-            option.style.display = (matchesPractitioner && matchesTreatmentType) ? 'block' : 'none';
-        });
-        
-        // Select the first visible option if none is selected
-        let hasVisibleSelected = false;
-        Array.from(sessionTypeSelect.options).forEach(option => {
-            if (option.style.display === 'block' && option.selected) {
-                hasVisibleSelected = true;
-            }
-        });
-        
-        // If no visible option is selected, select the first visible one (not the default)
-        if (!hasVisibleSelected) {
-            const firstVisibleOption = Array.from(sessionTypeSelect.options).find(option => {
-                return option.style.display === 'block' && option.value !== '';
-            });
-            
-            if (firstVisibleOption) {
-                firstVisibleOption.selected = true;
-                console.log('Auto-selected session type:', firstVisibleOption.value);
-            }
-        }
-        
-        console.log('Session types filtered for practitioner:', practitionerId);
     }
-    
+
     function selectDate(dateStr) {
-        console.log('Date selected:', dateStr);
-        lastSelectedDate = dateStr;
+        selectedDate = dateStr;
         document.getElementById('appointment_date').value = dateStr;
-        
-        // Load available times for this date
-        loadTimeSlotsForDate(dateStr);
-        
-        // Re-render calendar to show selection
-        renderCalendar(currentMonth, currentYear);
+        loadAvailableTimesForDate(dateStr);
     }
-    
+
     function selectTime(timeStr) {
-        console.log('Time selected:', timeStr);
         selectedTime = timeStr;
         document.getElementById('appointment_time').value = timeStr;
-        
-        // Update visual selection
         document.querySelectorAll('.time-slot-btn').forEach(btn => {
             btn.classList.remove('selected');
             btn.style.backgroundColor = '#28a745';
-            btn.style.borderColor = '#28a745';
+            btn.style.color = 'white';
         });
-        
         const selectedBtn = document.querySelector(`[data-time="${timeStr}"]`);
         if (selectedBtn) {
             selectedBtn.classList.add('selected');
             selectedBtn.style.backgroundColor = '#007bff';
-            selectedBtn.style.borderColor = '#007bff';
+            selectedBtn.style.color = 'white';
         }
     }
-    
-    function loadTimeSlotsForDate(date) {
-        console.log('Loading time slots for date:', date);
+
+    function loadAvailableTimesForDate(date) {
         const container = document.getElementById('time-slots-container');
-        
-        if (!selectedPractitionerId) {
-            container.innerHTML = '<p class="text-muted text-center">Please select a practitioner first</p>';
-            return;
-        }
-        
-        // Show loading
         container.innerHTML = '<p class="text-center text-muted">Loading available times...</p>';
-        
-        // Get available time slots for the selected date and practitioner
-        const availableSlots = getTimeSlotsForDate(date);
-        
+        const availableTimes = getTimeSlotsForDate(date);
         setTimeout(() => {
             container.innerHTML = '';
-            
-            if (availableSlots.length === 0) {
+            if (availableTimes.length === 0) {
                 container.innerHTML = '<p class="text-center text-muted">No available times for this date</p>';
                 return;
             }
-            
-            availableSlots.forEach(slot => {
+            availableTimes.forEach(time => {
                 const timeBtn = document.createElement('button');
                 timeBtn.type = 'button';
-                timeBtn.className = 'time-slot-btn';
-                timeBtn.setAttribute('data-time', slot.time);
-                timeBtn.textContent = slot.display;
-                
-                // Check if this time is already selected
-                if (slot.time === selectedTime) {
+                timeBtn.className = 'time-slot-btn btn btn-outline-success btn-sm mr-2 mb-2';
+                timeBtn.setAttribute('data-time', time);
+                const [hour, minute] = time.split(':');
+                const hourInt = parseInt(hour);
+                const displayTime = hourInt > 12 ? `${hourInt - 12}:${minute} PM` : 
+                                   hourInt === 12 ? `12:${minute} PM` : 
+                                   hourInt === 0 ? `12:${minute} AM` : `${hourInt}:${minute} AM`;
+                timeBtn.textContent = displayTime;
+                timeBtn.style.minWidth = '80px';
+                if (time === selectedTime) {
                     timeBtn.classList.add('selected');
                     timeBtn.style.backgroundColor = '#007bff';
-                    timeBtn.style.borderColor = '#007bff';
+                    timeBtn.style.color = 'white';
                 }
-                
                 timeBtn.onclick = function() {
-                    selectTime(slot.time);
+                    selectTime(time);
                 };
-                
                 container.appendChild(timeBtn);
             });
         }, 300);
     }
-    
-    function getTimeSlotsForDate(date) {
-        if (!selectedPractitionerId || !availableDatesObj[selectedPractitionerId]) return [];
-        const day = availableDatesObj[selectedPractitionerId].find(d => d.availability_date === date);
-        if (!day) return [];
-        
-        const slots = [];
-        const startTime = parseInt(day.start_time.split(':')[0]);
-        const endTime = parseInt(day.end_time.split(':')[0]);
-        
-        for (let hour = startTime; hour < endTime; hour++) {
-            const timeStr = `${String(hour).padStart(2, '0')}:00`;
-            const displayTime = hour > 12 ? `${hour - 12}:00 PM` : 
-                               hour === 12 ? `12:00 PM` : 
-                               hour === 0 ? `12:00 AM` : `${hour}:00 AM`;
-            
-            slots.push({
-                time: timeStr,
-                display: displayTime
-            });
-        }
-        
-        return slots;
-    }
-    
-    function clearCalendar() {
-        const calendarGrid = document.getElementById('calendar-grid');
-        if (calendarGrid) {
-            calendarGrid.innerHTML = '';
-        }
-        const timeContainer = document.getElementById('time-slots-container');
-        if (timeContainer) {
-            timeContainer.innerHTML = '<p class="text-muted text-center">Select a date to see available times</p>';
-        }
-    }
-    
-    function renderCalendar(month, year) {
-        const calendar = document.getElementById('availability-calendar');
-        const monthLabel = document.getElementById('calendar-month-label');
-        const calendarGrid = document.getElementById('calendar-grid');
-        
-        if (!calendarGrid) return;
-        
-        calendarGrid.innerHTML = '';
-        
-        // Update month label
-        const monthNames = ['January', 'February', 'March', 'April', 'May', 'June',
-                           'July', 'August', 'September', 'October', 'November', 'December'];
-        if (monthLabel) {
-            monthLabel.textContent = `${monthNames[month]} ${year}`;
-        }
-        
-        // Get calendar info
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const firstDay = new Date(year, month, 1).getDay();
-        
-        // Add empty cells for days before the first day
-        for (let i = 0; i < firstDay; i++) {
-            const emptyCell = document.createElement('div');
-            emptyCell.style.cssText = 'min-height: 32px; margin: 0; padding: 0; background: transparent;';
-            calendarGrid.appendChild(emptyCell);
-        }
-        
-        // Get available dates
-        const availableDates = selectedPractitionerId && availableDatesObj[selectedPractitionerId] ? 
-                              availableDatesObj[selectedPractitionerId].map(d => d.availability_date) : [];
-        
-        // Add day buttons
-        for (let d = 1; d <= daysInMonth; d++) {
-            const dayButton = document.createElement('button');
-            dayButton.type = 'button';
-            dayButton.textContent = d;
-            dayButton.style.cssText = 'width: 36px; height: 36px; border: none; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 500; cursor: pointer; transition: all 0.2s; margin: 2px auto; padding: 0; font-size: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);';
-            
-            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-            const isAvailable = availableDates.includes(dateStr);
-            const isSelected = dateStr === lastSelectedDate;
-            
-            if (isSelected && isAvailable) {
-                dayButton.style.backgroundColor = '#007bff';
-                dayButton.style.color = 'white';
-                dayButton.style.boxShadow = '0 2px 4px rgba(0, 123, 255, 0.3)';
-            } else if (isAvailable) {
-                dayButton.style.backgroundColor = '#28a745';
-                dayButton.style.color = 'white';
-                dayButton.style.boxShadow = '0 2px 4px rgba(40, 167, 69, 0.3)';
-            } else {
-                dayButton.style.backgroundColor = '#6c757d';
-                dayButton.style.color = '#adb5bd';
-                dayButton.disabled = true;
-            }
-            
-            if (isAvailable) {
-                dayButton.onclick = function() {
-                    selectDate(dateStr);
-                };
-            }
-            
-            calendarGrid.appendChild(dayButton);
-        }
-    }
-    
-    // Event listeners
-    typeSelect.addEventListener('change', filterPractitioners);
-    
-    practitionerSelect.addEventListener('change', function() {
-        selectedPractitionerId = this.value;
-        
-        // Clear and reload session types based on selected practitioner
-        loadSessionTypesForPractitioner(selectedPractitionerId);
-        
-        // Update calendar if practitioner is selected
-        if (selectedPractitionerId) {
-            renderCalendar(currentMonth, currentYear);
-        } else {
-            clearCalendar();
-        }
-        
-        console.log('Practitioner changed to:', selectedPractitionerId);
-    });
-    
+
     // Navigation buttons
     const prevBtn = document.getElementById('prev-month');
     const nextBtn = document.getElementById('next-month');
-    
     if (prevBtn) {
         prevBtn.onclick = function() {
             currentMonth--;
@@ -615,10 +436,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 currentMonth = 11;
                 currentYear--;
             }
-            renderCalendar(currentMonth, currentYear);
+            renderAvailableDates();
         };
     }
-    
     if (nextBtn) {
         nextBtn.onclick = function() {
             currentMonth++;
@@ -626,61 +446,33 @@ document.addEventListener('DOMContentLoaded', function() {
                 currentMonth = 0;
                 currentYear++;
             }
-            renderCalendar(currentMonth, currentYear);
+            renderAvailableDates();
         };
     }
-    
-    // Initial setup
-    filterPractitioners();
-    
-    // Force render calendar regardless of practitioner selection
-    renderCalendar(currentMonth, currentYear);
-    
-    // Pre-select the current practitioner if it exists
-    if (selectedPractitionerId) {
-        // Make sure the practitioner is selected in the dropdown
-        if (practitionerSelect.value !== selectedPractitionerId) {
-            practitionerSelect.value = selectedPractitionerId;
+    // Practitioner change event
+    document.getElementById('practitioner_id').addEventListener('change', function() {
+        selectedPractitionerId = this.value;
+        renderAvailableDates();
+        document.getElementById('appointment_date').value = '';
+        document.getElementById('appointment_time').value = '';
+        document.getElementById('time-slots-container').innerHTML = '<p class="text-muted text-center">Select a date to see available times</p>';
+    });
+    // Ensure form always submits the selected date/time and warn if missing
+    document.querySelector('form').addEventListener('submit', function(e) {
+        document.getElementById('appointment_date').value = selectedDate;
+        document.getElementById('appointment_time').value = selectedTime;
+        let warn = '';
+        if (!selectedDate) warn += 'Please select an appointment date.\n';
+        if (!selectedTime) warn += 'Please select an appointment time.';
+        if (warn) {
+            alert(warn);
+            e.preventDefault();
         }
-        
-        // Load session types for the selected practitioner
-        loadSessionTypesForPractitioner(selectedPractitionerId);
-        
-        // Load time slots if date is selected
-        if (lastSelectedDate) {
-            loadTimeSlotsForDate(lastSelectedDate);
-        }
-    } else {
-        // If no practitioner is selected but we have an appointment with a practitioner_id
-        const appointmentPractitionerId = '{{ $appointment->practitioner_id }}';
-        if (appointmentPractitionerId) {
-            console.log('Using appointment practitioner ID:', appointmentPractitionerId);
-            // Select the practitioner from the appointment
-            practitionerSelect.value = appointmentPractitionerId;
-            selectedPractitionerId = appointmentPractitionerId;
-            
-            // Load session types for this practitioner
-            loadSessionTypesForPractitioner(appointmentPractitionerId);
-            
-            // Load time slots if date is selected
-            if (lastSelectedDate) {
-                loadTimeSlotsForDate(lastSelectedDate);
-            }
-        }
-    }
-    
-    // Force calendar rendering again to ensure it displays
-    setTimeout(() => {
-        renderCalendar(currentMonth, currentYear);
-    }, 100);
-    
-    // Debug information
-    console.log('Initial setup complete');
-    console.log('Selected practitioner ID:', selectedPractitionerId);
-    console.log('Selected date:', lastSelectedDate);
-    console.log('Selected time:', selectedTime);
-    console.log('Session type ID:', '{{ old("session_type_id", $appointment->session_type_id) }}');
-    console.log('Available session types:', allSessionTypes);
+    });
+    // Initial render
+    renderAvailableDates();
+    if (selectedDate) {
+        loadAvailableTimesForDate(selectedDate);
     }
 });
 </script>
