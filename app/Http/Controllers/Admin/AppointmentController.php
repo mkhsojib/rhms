@@ -15,7 +15,7 @@ class AppointmentController extends Controller
      */
     public function index()
     {
-        $appointments = Appointment::with(['patient', 'practitioner'])
+        $appointments = Appointment::with(['patient', 'practitioner', 'sessionType'])
             ->where('practitioner_id', \Illuminate\Support\Facades\Auth::id())
             ->orderBy('id', 'desc')
             ->paginate(15);
@@ -268,6 +268,18 @@ class AppointmentController extends Controller
 
         $validated['practitioner_id'] = auth()->id();
         $validated['updated_by'] = \Illuminate\Support\Facades\Auth::id();
+        
+        // If session_type_id is provided, also update the session type details
+        if (!empty($validated['session_type_id'])) {
+            $sessionType = \App\Models\RaqiSessionType::find($validated['session_type_id']);
+            if ($sessionType) {
+                $validated['session_type_name'] = $sessionType->type;
+                $validated['session_type_fee'] = $sessionType->fee;
+                $validated['session_type_min_duration'] = $sessionType->min_duration;
+                $validated['session_type_max_duration'] = $sessionType->max_duration;
+            }
+        }
+        
         $appointment->update($validated);
 
         return redirect()->route('admin.appointments.index')
@@ -275,8 +287,6 @@ class AppointmentController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Appointment $appointment)
     {
         $this->authorize('delete', $appointment);

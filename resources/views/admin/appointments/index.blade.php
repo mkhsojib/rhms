@@ -45,10 +45,13 @@
                                         <span class="badge badge-{{ $appointment->type === 'ruqyah' ? 'info' : 'warning' }}">
                                             {{ ucfirst($appointment->type) }}
                                         </span>
-                                        @if($appointment->sessionType)
+                                        @php
+                                            $sessionTypeName = $appointment->session_type_name ?? $appointment->sessionType->type ?? $appointment->sessionType->name ?? null;
+                                        @endphp
+                                        @if($sessionTypeName)
                                             <br>
                                             <small class="text-muted">
-                                                <strong>Session:</strong> {{ $appointment->sessionType->name }}
+                                                <strong>Session:</strong> {{ ucwords(str_replace('_', ' ', $sessionTypeName)) }}
                                             </small>
                                         @endif
                                     </td>
