@@ -79,17 +79,17 @@
                                 <span id="calendar-month-label" class="mx-3 font-weight-bold"></span>
                                 <button type="button" id="next-month" class="btn btn-outline-secondary btn-sm">&gt;</button>
                             </div>
-                            <div id="availability-calendar" style="border: 2px solid #007bff; background: #f8f9fa; padding: 0; width: 100%; min-height: 200px;">
-                                <div id="calendar-day-header" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 8px;">
-                                    <div style="text-align: center; font-weight: 600; padding: 8px 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px;">Sun</div>
-                                    <div style="text-align: center; font-weight: 600; padding: 8px 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px;">Mon</div>
-                                    <div style="text-align: center; font-weight: 600; padding: 8px 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px;">Tue</div>
-                                    <div style="text-align: center; font-weight: 600; padding: 8px 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px;">Wed</div>
-                                    <div style="text-align: center; font-weight: 600; padding: 8px 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px;">Thu</div>
-                                    <div style="text-align: center; font-weight: 600; padding: 8px 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px;">Fri</div>
-                                    <div style="text-align: center; font-weight: 600; padding: 8px 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px;">Sat</div>
+                            <div id="availability-calendar" style="border: 1px solid #dee2e6; background: white; border-radius: 8px; padding: 0; width: 100%; min-height: 200px;">
+                                <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 8px;">
+                                    <div style="text-align: center; font-weight: 600; padding: 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; width: 36px; margin: 0 auto;">Sun</div>
+                                    <div style="text-align: center; font-weight: 600; padding: 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; width: 36px; margin: 0 auto;">Mon</div>
+                                    <div style="text-align: center; font-weight: 600; padding: 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; width: 36px; margin: 0 auto;">Tue</div>
+                                    <div style="text-align: center; font-weight: 600; padding: 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; width: 36px; margin: 0 auto;">Wed</div>
+                                    <div style="text-align: center; font-weight: 600; padding: 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; width: 36px; margin: 0 auto;">Thu</div>
+                                    <div style="text-align: center; font-weight: 600; padding: 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; width: 36px; margin: 0 auto;">Fri</div>
+                                    <div style="text-align: center; font-weight: 600; padding: 4px; color: #495057; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; width: 36px; margin: 0 auto;">Sat</div>
                                 </div>
-                                <div id="calendar-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 0 8px 8px 8px;"></div>
+                                <div id="calendar-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 0 8px 8px 8px; justify-items: center;"></div>
                             </div>
                             <input type="hidden" name="appointment_date" id="appointment_date" value="{{ old('appointment_date', $appointment->appointment_date ? \Carbon\Carbon::parse($appointment->appointment_date)->format('Y-m-d') : '' ) }}" required>
                             @error('appointment_date')
@@ -136,6 +136,20 @@
                             <div id="sessionTypeInfo" class="mt-2 text-info"></div>
                         </div>
                     </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="status">Status *</label>
+                            <select name="status" id="status" class="form-control @error('status') is-invalid @enderror" required>
+                                <option value="pending" {{ old('status', $appointment->status) == 'pending' ? 'selected' : '' }}>Pending</option>
+                                <option value="approved" {{ old('status', $appointment->status) == 'approved' ? 'selected' : '' }}>Approved</option>
+                                <option value="rejected" {{ old('status', $appointment->status) == 'rejected' ? 'selected' : '' }}>Rejected</option>
+                                <option value="completed" {{ old('status', $appointment->status) == 'completed' ? 'selected' : '' }}>Completed</option>
+                            </select>
+                            @error('status')
+                                <span class="invalid-feedback">{{ $message }}</span>
+                            @enderror
+                        </div>
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -174,9 +188,8 @@
 @section('css')
 <style>
 #availability-calendar {
-    display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 2px;
+    display: flex;
+    flex-direction: column;
     min-height: 40px;
     background: white;
     border: 1px solid #dee2e6;
@@ -186,18 +199,17 @@
 #availability-calendar button {
     width: 36px;
     height: 36px;
-    border: none;
-    border-radius: 50%;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 500;
+    font-weight: 700;
     cursor: pointer;
     transition: all 0.2s;
     margin: 2px auto;
     padding: 0;
     font-size: 14px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 #availability-calendar button.available {
     background-color: #28a745 !important;
@@ -271,7 +283,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentYear = new Date().getFullYear();
     let selectedDate = '{{ old('appointment_date', $appointment->appointment_date ? \Carbon\Carbon::parse($appointment->appointment_date)->format('Y-m-d') : '' ) }}';
     let selectedTime = '{{ old('appointment_time', $appointment->appointment_time ? \Carbon\Carbon::parse($appointment->appointment_time)->format('H:i') : '' ) }}';
-    let selectedPractitionerId = document.getElementById('practitioner_id').value;
+    let selectedPractitionerId = '{{ old('practitioner_id', $appointment->practitioner_id) }}';
     const availableDatesObj = @json($availableDates ?? []);
 
     function updateCalendarNavigation() {
@@ -310,62 +322,83 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function renderAvailableDates() {
+        console.log('=== RENDERING CALENDAR ===');
+        console.log('Current month:', currentMonth, 'Year:', currentYear);
+        
         const calendarGrid = document.getElementById('calendar-grid');
-        if (!calendarGrid) return;
+        if (!calendarGrid) {
+            console.error('Calendar grid not found!');
+            return;
+        }
+        
+        // Clear calendar
         calendarGrid.innerHTML = '';
+        
+        // Update month label
         updateCalendarNavigation();
+        
+        // Get calendar info
         const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
         const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-        const availableDates = getAvailableDates();
-        const totalCells = 42; // 7 days x 6 weeks
-        let day = 1;
-        for (let cell = 0; cell < totalCells; cell++) {
-            const cellDiv = document.createElement('button');
-            cellDiv.type = 'button';
-            cellDiv.style.cssText = 'width: 100%; height: 36px; border: 1px solid #dee2e6; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 700; cursor: pointer; transition: all 0.2s; margin: 2px; padding: 4px; font-size: 14px;';
-            if (cell >= firstDay && day <= daysInMonth) {
-                const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                const isAvailable = availableDates.includes(dateStr);
-                const isSelected = dateStr === selectedDate;
-                cellDiv.textContent = day;
-                if (!selectedPractitionerId) {
-                    cellDiv.style.backgroundColor = '#f8f9fa';
-                    cellDiv.style.color = '#adb5bd';
-                    cellDiv.disabled = true;
-                } else if (isSelected && isAvailable) {
-                    cellDiv.classList.add('selected-date');
-                    cellDiv.disabled = false;
-                    cellDiv.style.setProperty('background-color', '#007bff', 'important');
-                    cellDiv.style.setProperty('color', 'white', 'important');
-                    cellDiv.style.setProperty('border-color', '#007bff', 'important');
-                    cellDiv.onclick = function() {
-                        selectDate(dateStr);
-                        renderAvailableDates();
-                    };
-                } else if (isAvailable) {
-                    cellDiv.classList.add('available-date');
-                    cellDiv.disabled = false;
-                    cellDiv.style.setProperty('background-color', '#28a745', 'important');
-                    cellDiv.style.setProperty('color', 'white', 'important');
-                    cellDiv.style.setProperty('border-color', '#28a745', 'important');
-                    cellDiv.onclick = function() {
-                        selectDate(dateStr);
-                        renderAvailableDates();
-                    };
-                } else {
-                    cellDiv.style.backgroundColor = '#f8f9fa';
-                    cellDiv.style.color = '#6c757d';
-                    cellDiv.style.borderColor = '#dee2e6';
-                    cellDiv.disabled = true;
-                }
-                day++;
-            } else {
-                cellDiv.textContent = '';
-                cellDiv.style.backgroundColor = '#f8f9fa';
-                cellDiv.style.color = '#adb5bd';
-                cellDiv.disabled = true;
+        
+        console.log('Days in month:', daysInMonth, 'First day:', firstDay);
+        
+        // Add empty cells for days before the first day
+            for (let i = 0; i < firstDay; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.style.cssText = 'min-height: 28px; margin: 0; padding: 0; background: transparent;';
+                calendarGrid.appendChild(emptyCell);
             }
-            calendarGrid.appendChild(cellDiv);
+        
+        // Get available dates
+        const availableDates = getAvailableDates();
+        
+        // Use serverToday for all comparisons
+        for (let d = 1; d <= daysInMonth; d++) {
+            const dayButton = document.createElement('button');
+            dayButton.type = 'button';
+            dayButton.textContent = d;
+            dayButton.style.cssText = 'width: 100%; height: 36px; border: 1px solid #dee2e6; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-weight: 700; cursor: pointer; transition: all 0.2s; margin: 2px; padding: 4px; font-size: 14px;';
+            
+            const dateObj = new Date(currentYear, currentMonth, d);
+            const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            const isAvailable = availableDates.includes(dateStr);
+            const isSelected = dateStr === selectedDate;
+            
+            if (!selectedPractitionerId) {
+                // No practitioner selected
+                dayButton.style.backgroundColor = '#f8f9fa';
+                dayButton.style.color = '#adb5bd';
+                dayButton.disabled = true;
+            } else if (isSelected && isAvailable) {
+                // Selected date
+                dayButton.classList.add('selected-date');
+                dayButton.disabled = false;
+                dayButton.style.setProperty('background-color', '#007bff', 'important');
+                dayButton.style.setProperty('color', 'white', 'important');
+                dayButton.style.setProperty('border-color', '#007bff', 'important');
+                dayButton.onclick = function() {
+                    selectDate(dateStr);
+                    renderAvailableDates(); // Re-render to update selection
+                };
+            } else if (isAvailable) {
+                dayButton.classList.add('available-date');
+                dayButton.disabled = false;
+                dayButton.style.setProperty('background-color', '#28a745', 'important');
+                dayButton.style.setProperty('color', 'white', 'important');
+                dayButton.style.setProperty('border-color', '#28a745', 'important');
+                dayButton.onclick = function() {
+                    selectDate(dateStr);
+                    renderAvailableDates(); // Re-render to update selection
+                };
+            } else {
+                dayButton.style.backgroundColor = '#f8f9fa'; // Gray
+                dayButton.style.color = '#6c757d';
+                dayButton.style.borderColor = '#dee2e6';
+                dayButton.disabled = true;
+            }
+            
+            calendarGrid.appendChild(dayButton);
         }
     }
 
@@ -459,11 +492,21 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     // Ensure form always submits the selected date/time and warn if missing
     document.querySelector('form').addEventListener('submit', function(e) {
-        document.getElementById('appointment_date').value = selectedDate;
-        document.getElementById('appointment_time').value = selectedTime;
+        // Update hidden fields with current selections
+        if (selectedDate) {
+            document.getElementById('appointment_date').value = selectedDate;
+        }
+        if (selectedTime) {
+            document.getElementById('appointment_time').value = selectedTime;
+        }
+        
+        // Get current values from hidden fields (may be pre-filled from existing appointment)
+        const currentDate = document.getElementById('appointment_date').value;
+        const currentTime = document.getElementById('appointment_time').value;
+        
         let warn = '';
-        if (!selectedDate) warn += 'Please select an appointment date.\n';
-        if (!selectedTime) warn += 'Please select an appointment time.';
+        if (!currentDate) warn += 'Please select an appointment date.\n';
+        if (!currentTime) warn += 'Please select an appointment time.';
         if (warn) {
             alert(warn);
             e.preventDefault();
