@@ -69,11 +69,11 @@
                     </div>
                 </div>
 
-                <div class="row">
+                <div class="row" id="session-type-row">
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="session_type_id">Session Type *</label>
-                            <select name="session_type_id" id="session_type_id" class="form-control @error('session_type_id') is-invalid @enderror" required>
+                            <select name="session_type_id" id="session_type_id" class="form-control @error('session_type_id') is-invalid @enderror">
                                 <option value="">Select Session Type</option>
                             </select>
                             @error('session_type_id')
@@ -309,6 +309,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function filterPractitioners() {
         const selectedType = typeSelect.value;
+        const sessionTypeRow = document.getElementById('session-type-row');
+        
+        // Show/hide session type field based on treatment type
+        if (selectedType === 'hijama') {
+            sessionTypeRow.style.display = 'none';
+            sessionTypeSelect.removeAttribute('required');
+        } else if (selectedType === 'ruqyah') {
+            sessionTypeRow.style.display = 'block';
+            sessionTypeSelect.setAttribute('required', 'required');
+        } else {
+            sessionTypeRow.style.display = 'none';
+            sessionTypeSelect.removeAttribute('required');
+        }
+        
         practitionerSelect.innerHTML = '';
         practitionerSelect.appendChild(allPractitionerOptions[0]);
         allPractitionerOptions.slice(1).forEach(option => {
@@ -343,14 +357,15 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Filter session types for the selected practitioner and selected treatment type
+        // Only load session types for Ruqyah (since Hijama doesn't need session types)
         const selectedType = typeSelect.value;
-        let allowedTypes = [];
-        if (selectedType === 'ruqyah') {
-            allowedTypes = ['diagnosis', 'short', 'long'];
-        } else if (selectedType === 'hijama') {
-            allowedTypes = ['head_cupping', 'body_cupping'];
+        if (selectedType !== 'ruqyah') {
+            console.log('Treatment type is not Ruqyah, skipping session type loading');
+            return;
         }
+        
+        // Filter session types for Ruqyah only
+        const allowedTypes = ['diagnosis', 'short', 'long'];
         const practitionerSessionTypes = allSessionTypes.filter(type => type.practitioner_id == practitionerId && allowedTypes.includes(type.type));
         console.log('Filtered session types for practitioner and type:', practitionerSessionTypes);
         
@@ -716,6 +731,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initial setup
     filterPractitioners();
     renderCalendar(currentMonth, currentYear);
+    
+    // Set initial session type field visibility
+    const sessionTypeRow = document.getElementById('session-type-row');
+    sessionTypeRow.style.display = 'none'; // Hidden by default until treatment type is selected
     
     // Test: Force render a simple calendar if nothing shows
     setTimeout(() => {
