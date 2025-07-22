@@ -101,20 +101,24 @@
                                         $stypeMax = $appointment->session_type_max_duration ?? $appointment->sessionType->max_duration ?? null;
                                     @endphp
                                     @if($appointment->type === 'hijama')
-                                        @php
-                                            $headCupping = $appointment->practitioner->sessionTypes->where('type', 'head_cupping')->first();
-                                            $bodyCupping = $appointment->practitioner->sessionTypes->where('type', 'body_cupping')->first();
-                                        @endphp
-                                        <div class="mb-1">
-                                            @if($headCupping)
-                                                <strong>Head Cupping:</strong> <span class="text-green-700 font-semibold">{{ number_format($headCupping->fee, 2) }}</span> per cup
-                                            @endif
-                                        </div>
-                                        <div class="mb-1">
-                                            @if($bodyCupping)
-                                                <strong>Body Cupping:</strong> <span class="text-green-700 font-semibold">{{ number_format($bodyCupping->fee, 2) }}</span> per cup
-                                            @endif
-                                        </div>
+                                        {{-- Display Head Cupping pricing from appointments table --}}
+                                        @if($appointment->head_cupping_fee)
+                                            <div class="mb-2">
+                                                <strong>Head Cupping:</strong> <span class="text-green-700 font-semibold">{{ number_format($appointment->head_cupping_fee, 2) }}</span> per cup
+                                            </div>
+                                        @endif
+                                        
+                                        {{-- Display Body Cupping pricing from appointments table --}}
+                                        @if($appointment->body_cupping_fee)
+                                            <div class="mb-2">
+                                                <strong>Body Cupping:</strong> <span class="text-green-700 font-semibold">{{ number_format($appointment->body_cupping_fee, 2) }}</span> per cup
+                                            </div>
+                                        @endif
+                                        
+                                        {{-- Fallback if no Hijama pricing is stored --}}
+                                        @if(!$appointment->head_cupping_fee && !$appointment->body_cupping_fee)
+                                            <p class="text-gray-500">No Hijama pricing available</p>
+                                        @endif
                                     @else
                                         @if($stypeName)
                                             <p class="text-gray-600 mb-1">

@@ -103,9 +103,6 @@
                                             <div class="mb-2">
                                                 <strong>Head Cupping</strong>
                                                 <br><span class="text-success font-weight-bold">Estimate Per Cup: {{ number_format($appointment->head_cupping_fee, 2) }}</span>
-                                                @if($appointment->head_cupping_min_duration && $appointment->head_cupping_max_duration)
-                                                    &mdash; Duration: <span class="text-primary">{{ $appointment->head_cupping_min_duration }}-{{ $appointment->head_cupping_max_duration }} min</span>
-                                                @endif
                                             </div>
                                         @endif
                                         
@@ -114,9 +111,6 @@
                                             <div class="mb-2">
                                                 <strong>Body Cupping</strong>
                                                 <br><span class="text-success font-weight-bold">Estimate Per Cup: {{ number_format($appointment->body_cupping_fee, 2) }}</span>
-                                                @if($appointment->body_cupping_min_duration && $appointment->body_cupping_max_duration)
-                                                    &mdash; Duration: <span class="text-primary">{{ $appointment->body_cupping_min_duration }}-{{ $appointment->body_cupping_max_duration }} min</span>
-                                                @endif
                                             </div>
                                         @endif
                                         

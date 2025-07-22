@@ -76,12 +76,45 @@
                                 <tr>
                                     <td><strong>Session Type:</strong></td>
                                     <td>
-                                        @if($appointment->sessionType)
-                                            {{ ucfirst(str_replace('_', ' ', $appointment->sessionType->type)) }}
-                                            (Fee: ${{ number_format($appointment->sessionType->fee, 2) }},
-                                            Duration: {{ $appointment->sessionType->min_duration }}-{{ $appointment->sessionType->max_duration }} min)
+                                        @if($appointment->type === 'hijama')
+                                            {{-- Display Head Cupping pricing from appointments table --}}
+                                            @if($appointment->head_cupping_fee)
+                                                <div class="mb-2">
+                                                    <strong>Head Cupping</strong>
+                                                    <br><span class="text-success font-weight-bold">Estimate Per Cup: ${{ number_format($appointment->head_cupping_fee, 2) }}</span>
+                                                </div>
+                                            @endif
+                                            
+                                            {{-- Display Body Cupping pricing from appointments table --}}
+                                            @if($appointment->body_cupping_fee)
+                                                <div class="mb-2">
+                                                    <strong>Body Cupping</strong>
+                                                    <br><span class="text-success font-weight-bold">Estimate Per Cup: ${{ number_format($appointment->body_cupping_fee, 2) }}</span>
+                                                </div>
+                                            @endif
+                                            
+                                            {{-- Fallback if no Hijama pricing is stored --}}
+                                            @if(!$appointment->head_cupping_fee && !$appointment->body_cupping_fee)
+                                                <span class="text-muted">No Hijama pricing available</span>
+                                            @endif
                                         @else
-                                            <span class="text-muted">Not specified</span>
+                                            @php
+                                                $stypeName = $appointment->session_type_name ?? $appointment->sessionType->type ?? null;
+                                                $stypeFee = $appointment->session_type_fee ?? $appointment->sessionType->fee ?? null;
+                                                $stypeMin = $appointment->session_type_min_duration ?? $appointment->sessionType->min_duration ?? null;
+                                                $stypeMax = $appointment->session_type_max_duration ?? $appointment->sessionType->max_duration ?? null;
+                                            @endphp
+                                            @if($stypeName)
+                                                <strong>{{ ucwords(str_replace('_', ' ', $stypeName)) }}</strong>
+                                                @if($stypeFee)
+                                                    <br>Fee: <span class="text-success">${{ number_format($stypeFee, 2) }}</span>
+                                                @endif
+                                                @if($stypeMin && $stypeMax)
+                                                    <br>Duration: <span class="text-primary">{{ $stypeMin }}-{{ $stypeMax }} min</span>
+                                                @endif
+                                            @else
+                                                <span class="text-muted">Not specified</span>
+                                            @endif
                                         @endif
                                     </td>
                                 </tr>
