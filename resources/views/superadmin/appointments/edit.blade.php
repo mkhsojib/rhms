@@ -506,11 +506,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 timeBtn.setAttribute('data-time', time);
                 const [hour, minute] = time.split(':');
                 const hourInt = parseInt(hour);
-                const displayTime = hourInt > 12 ? `${hourInt - 12}:${minute} PM` : 
-                                   hourInt === 12 ? `12:${minute} PM` : 
-                                   hourInt === 0 ? `12:${minute} AM` : `${hourInt}:${minute} AM`;
-                timeBtn.textContent = displayTime;
-                timeBtn.style.minWidth = '80px';
+                const nextHourInt = hourInt + 1;
+                
+                // Format start time
+                const startTime = hourInt > 12 ? `${hourInt - 12}:${minute} PM` : 
+                                 hourInt === 12 ? `12:${minute} PM` : 
+                                 hourInt === 0 ? `12:${minute} AM` : `${hourInt}:${minute} AM`;
+                
+                // Format end time
+                const endTime = nextHourInt > 12 ? `${nextHourInt - 12}:${minute} PM` : 
+                               nextHourInt === 12 ? `12:${minute} PM` : 
+                               nextHourInt === 0 ? `12:${minute} AM` : `${nextHourInt}:${minute} AM`;
+                
+                // Display as a range
+                timeBtn.textContent = `${startTime} - ${endTime}`;
+                timeBtn.style.minWidth = '160px';
                 if (time === selectedTime) {
                     timeBtn.classList.add('selected');
                     timeBtn.style.backgroundColor = '#007bff';

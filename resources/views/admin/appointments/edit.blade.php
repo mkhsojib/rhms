@@ -349,12 +349,21 @@ function loadAvailableTimesForDate(date) {
             // Format time display
             const [hour, minute] = time.split(':');
             const hourInt = parseInt(hour);
-            const displayTime = hourInt > 12 ? `${hourInt - 12}:${minute} PM` : 
-                               hourInt === 12 ? `12:${minute} PM` : 
-                               hourInt === 0 ? `12:${minute} AM` : `${hourInt}:${minute} AM`;
+            const nextHourInt = hourInt + 1;
             
-            timeBtn.textContent = displayTime;
-            timeBtn.style.minWidth = '80px';
+            // Format start time
+            const startTime = hourInt > 12 ? `${hourInt - 12}:${minute} PM` : 
+                             hourInt === 12 ? `12:${minute} PM` : 
+                             hourInt === 0 ? `12:${minute} AM` : `${hourInt}:${minute} AM`;
+            
+            // Format end time
+            const endTime = nextHourInt > 12 ? `${nextHourInt - 12}:${minute} PM` : 
+                           nextHourInt === 12 ? `12:${minute} PM` : 
+                           nextHourInt === 0 ? `12:${minute} AM` : `${nextHourInt}:${minute} AM`;
+            
+            // Display as a range
+            timeBtn.textContent = `${startTime} - ${endTime}`;
+            timeBtn.style.minWidth = '160px';
             
             // Check if this is the currently selected time
             if (time === selectedTime) {
