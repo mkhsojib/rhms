@@ -7,8 +7,10 @@
 @stop
 
 @section('content')
-    <div class="card">
-        <div class="card-body">
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
 
             
             <form action="{{ route('superadmin.appointments.update', $appointment) }}" method="POST">
@@ -163,8 +165,89 @@
                     </a>
                 </div>
             </form>
+            </div>
         </div>
     </div>
+
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Current Information</h3>
+            </div>
+            <div class="card-body">
+                <p><strong>Patient:</strong> {{ $appointment->patient->name }}</p>
+                <p><strong>Practitioner:</strong> {{ $appointment->practitioner->name }}</p>
+                <p><strong>Type:</strong> {{ ucfirst($appointment->type) }}</p>
+                <p><strong>Date:</strong> {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M d, Y') }}</p>
+                <p><strong>Time:</strong> 
+                    @php
+                        $startTime = \Carbon\Carbon::parse($appointment->appointment_time);
+                        $endTime = $startTime->copy()->addHour(); // Add 1 hour for appointment duration
+                    @endphp
+                    {{ $startTime->format('g:i A') }} - {{ $endTime->format('g:i A') }}
+                </p>
+                <p><strong>Status:</strong> 
+                    @switch($appointment->status)
+                        @case('pending')
+                            <span class="badge badge-warning">Pending</span>
+                            @break
+                        @case('approved')
+                            <span class="badge badge-success">Approved</span>
+                            @break
+                        @case('rejected')
+                            <span class="badge badge-danger">Rejected</span>
+                            @break
+                        @case('completed')
+                            <span class="badge badge-info">Completed</span>
+                            @break
+                    @endswitch
+                </p>
+                <p><strong>Created:</strong> {{ $appointment->created_at ? \Carbon\Carbon::parse($appointment->created_at)->format('M d, Y g:i A') : 'N/A' }}</p>
+                <p><strong>Last Updated:</strong> {{ $appointment->updated_at ? \Carbon\Carbon::parse($appointment->updated_at)->format('M d, Y g:i A') : 'N/A' }}</p>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-header">
+                <h3 class="card-title">Quick Actions</h3>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    @if($appointment->status === 'pending')
+                        <form action="{{ route('superadmin.appointments.approve', $appointment) }}" method="POST">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="btn btn-success btn-block" 
+                                    onclick="return confirm('Approve this appointment?')">
+                                <i class="fas fa-check"></i> Approve
+                            </button>
+                        </form>
+
+                        <form action="{{ route('superadmin.appointments.reject', $appointment) }}" method="POST" class="mt-2">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="btn btn-danger btn-block" 
+                                    onclick="return confirm('Reject this appointment?')">
+                                <i class="fas fa-times"></i> Reject
+                            </button>
+                        </form>
+                    @endif
+
+                    @if($appointment->status === 'approved')
+                        <form action="{{ route('superadmin.appointments.complete', $appointment) }}" method="POST">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="btn btn-info btn-block" 
+                                    onclick="return confirm('Mark as completed?')">
+                                <i class="fas fa-check-double"></i> Mark as Completed
+                            </button>
+                        </form>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 @stop 
 
 @section('css')
