@@ -45,6 +45,12 @@
                                         <span class="badge badge-{{ $appointment->type === 'ruqyah' ? 'info' : 'warning' }}">
                                             {{ ucfirst($appointment->type) }}
                                         </span>
+                                        @if($appointment->sessionType)
+                                            <br>
+                                            <small class="text-muted">
+                                                <strong>Session:</strong> {{ $appointment->sessionType->name }}
+                                            </small>
+                                        @endif
                                     </td>
                                     <td>
                                         {{ \Carbon\Carbon::parse($appointment->appointment_date)->format('M d, Y') }}

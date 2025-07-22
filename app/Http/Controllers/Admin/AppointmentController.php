@@ -191,8 +191,61 @@ class AppointmentController extends Controller
     {
         $this->authorize('update', $appointment);
         
-        $patients = User::where('role', 'patient')->get();
-        return view('admin.appointments.edit', compact('appointment', 'patients'));
+        $patients = User::where('role', 'patient')->where('is_active', true)->get();
+        $practitioner = auth()->user();
+        $sessionTypes = \App\Models\RaqiSessionType::where('practitioner_id', $practitioner->id)->get();
+
+        // Determine available treatment types based on specialization
+        $availableTypes = collect();
+        if ($practitioner->specialization === 'ruqyah_healing') {
+            $availableTypes = collect(['ruqyah']);
+        } elseif ($practitioner->specialization === 'hijama_cupping') {
+            $availableTypes = collect(['hijama']);
+        } elseif ($practitioner->specialization === 'both') {
+            $availableTypes = collect(['ruqyah', 'hijama']);
+        }
+
+        // Build available dates for this practitioner
+        $availableDates = [];
+        $dates = \App\Models\RaqiMonthlyAvailability::where('practitioner_id', $practitioner->id)
+            ->where('is_available', true)
+            ->where('availability_date', '>=', now()->toDateString()) // Only present and future dates
+            ->get()
+            ->map(function($date) use ($practitioner) {
+                // Get booked times for this date, always format as H:i
+                $bookedTimes = \App\Models\Appointment::where('practitioner_id', $practitioner->id)
+                    ->where('appointment_date', $date->availability_date)
+                    ->where('status', '!=', 'cancelled')
+                    ->pluck('appointment_time')
+                    ->map(function($time) {
+                        return \Carbon\Carbon::parse($time)->format('H:i');
+                    })
+                    ->toArray();
+                
+                return [
+                    'availability_date' => \Carbon\Carbon::parse($date->availability_date)->format('Y-m-d'),
+                    'is_available' => $date->is_available,
+                    'start_time' => \Carbon\Carbon::parse($date->start_time)->format('H:i'),
+                    'end_time' => \Carbon\Carbon::parse($date->end_time)->format('H:i'),
+                    'slot_duration' => $date->slot_duration,
+                    'booked_times' => $bookedTimes
+                ];
+            })->toArray();
+        $availableDates[$practitioner->id] = $dates;
+
+        // Debug output
+        \Log::info('Admin Edit Available Dates:', $availableDates);
+
+        $serverToday = now()->format('Y-m-d');
+        return view('admin.appointments.edit', [
+            'appointment' => $appointment,
+            'patients' => $patients,
+            'practitioner' => $practitioner,
+            'sessionTypes' => $sessionTypes,
+            'availableDates' => $availableDates,
+            'availableTypes' => $availableTypes,
+            'serverToday' => $serverToday,
+        ]);
     }
 
     /**
@@ -205,13 +258,15 @@ class AppointmentController extends Controller
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
             'type' => 'required|in:ruqyah,hijama',
-            'appointment_date' => 'required|date',
+            'session_type_id' => 'required|exists:raqi_session_types,id',
+            'appointment_date' => 'required|date_format:Y-m-d',
             'appointment_time' => 'required|date_format:H:i',
             'symptoms' => 'nullable|string',
             'status' => 'required|in:pending,approved,rejected,completed',
             'notes' => 'nullable|string',
         ]);
 
+        $validated['practitioner_id'] = auth()->id();
         $validated['updated_by'] = \Illuminate\Support\Facades\Auth::id();
         $appointment->update($validated);
 
