@@ -7,5 +7,6 @@
 </head>
 <body>
 @include('superadmin.invoices._invoice_body', ['invoice' => $invoice])
+<a href="{{ route('admin.invoices.show', $invoice) }}" class="btn btn-secondary">Back</a>
 </body>
 </html> 
