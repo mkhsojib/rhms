@@ -261,6 +261,7 @@ class AppointmentController extends Controller
             'session_type_id' => 'required|exists:raqi_session_types,id',
             'appointment_date' => 'required|date_format:Y-m-d',
             'appointment_time' => 'required|date_format:H:i',
+            'appointment_end_time' => 'required|date_format:H:i',
             'symptoms' => 'nullable|string',
             'status' => 'required|in:pending,approved,rejected,completed',
             'notes' => 'nullable|string',

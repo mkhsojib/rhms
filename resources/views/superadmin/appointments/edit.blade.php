@@ -89,6 +89,7 @@
                                 <p class="text-muted text-center">Select a date to see available times</p>
                             </div>
                             <input type="hidden" name="appointment_time" id="appointment_time" value="{{ old('appointment_time', $appointment->appointment_time ? \Carbon\Carbon::parse($appointment->appointment_time)->format('H:i') : '' ) }}" required>
+                            <input type="hidden" name="appointment_end_time" id="appointment_end_time" value="{{ old('appointment_end_time', $appointment->appointment_end_time ? \Carbon\Carbon::parse($appointment->appointment_end_time)->format('H:i') : '' ) }}" required>
                             @error('appointment_time')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
@@ -476,6 +477,13 @@ document.addEventListener('DOMContentLoaded', function() {
     function selectTime(timeStr) {
         selectedTime = timeStr;
         document.getElementById('appointment_time').value = timeStr;
+        
+        // Calculate end time (1 hour after start time)
+        const [hour, minute] = timeStr.split(':').map(Number);
+        const endHour = (hour + 1) % 24;
+        const endTimeStr = `${String(endHour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+        document.getElementById('appointment_end_time').value = endTimeStr;
+        
         document.querySelectorAll('.time-slot-btn').forEach(btn => {
             btn.classList.remove('selected');
             btn.style.backgroundColor = '#28a745';
@@ -567,15 +575,25 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         if (selectedTime) {
             document.getElementById('appointment_time').value = selectedTime;
+            
+            // Calculate end time if not already set
+            if (!document.getElementById('appointment_end_time').value) {
+                const [hour, minute] = selectedTime.split(':').map(Number);
+                const endHour = (hour + 1) % 24;
+                const endTimeStr = `${String(endHour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+                document.getElementById('appointment_end_time').value = endTimeStr;
+            }
         }
         
         // Get current values from hidden fields (may be pre-filled from existing appointment)
         const currentDate = document.getElementById('appointment_date').value;
         const currentTime = document.getElementById('appointment_time').value;
+        const currentEndTime = document.getElementById('appointment_end_time').value;
         
         let warn = '';
         if (!currentDate) warn += 'Please select an appointment date.\n';
         if (!currentTime) warn += 'Please select an appointment time.';
+        if (!currentEndTime) warn += 'End time is missing.';
         if (warn) {
             alert(warn);
             e.preventDefault();
