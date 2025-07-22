@@ -129,6 +129,7 @@ Route::middleware(['auth', 'can:super_admin'])->prefix('superadmin')->name('supe
 // Admin (Raqi/Hijama Practitioner) Routes
 Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('appointments', AdminAppointmentController::class);
+    Route::post('appointments/get-session-types', [AdminAppointmentController::class, 'getSessionTypes'])->name('appointments.getSessionTypes');
     Route::patch('appointments/{appointment}/approve', [AdminAppointmentController::class, 'approve'])->name('appointments.approve');
     Route::patch('appointments/{appointment}/reject', [AdminAppointmentController::class, 'reject'])->name('appointments.reject');
     Route::patch('appointments/{appointment}/complete', [AdminAppointmentController::class, 'complete'])->name('appointments.complete');

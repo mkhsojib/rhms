@@ -97,24 +97,47 @@
                             <tr>
                                 <td><strong>Session Type:</strong></td>
                                 <td>
-                                    @php
-                                        $stypeName = $appointment->session_type_name ?? $appointment->sessionType->type ?? null;
-                                        $stypeFee = $appointment->session_type_fee ?? $appointment->sessionType->fee ?? null;
-                                        $stypeMin = $appointment->session_type_min_duration ?? $appointment->sessionType->min_duration ?? null;
-                                        $stypeMax = $appointment->session_type_max_duration ?? $appointment->sessionType->max_duration ?? null;
-                                    @endphp
-                                    @if($stypeName)
-                                        <strong>{{ ucwords(str_replace('_', ' ', $stypeName)) }}</strong>
-                                        @if($stypeFee && $appointment->type === 'hijama')
-                                            <br><span class="text-success font-weight-bold">Estimate Per Cup: {{ $stypeFee }}</span>
-                                        @elseif($stypeFee)
-                                            &mdash; Fee: <span class="text-success">{{ $stypeFee }}</span>
-                                        @endif
-                                        @if($stypeMin && $stypeMax)
-                                            &mdash; Duration: <span class="text-primary">{{ $stypeMin }}-{{ $stypeMax }} min</span>
+                                    @if($appointment->type === 'hijama')
+                                        @php
+                                            // For Hijama, show both Head Cupping and Body Cupping pricing from practitioner
+                                            $hijamaSessionTypes = \App\Models\RaqiSessionType::where('practitioner_id', $appointment->practitioner_id)
+                                                ->whereIn('type', ['head_cupping', 'body_cupping'])
+                                                ->orderByRaw("CASE WHEN type = 'head_cupping' THEN 1 WHEN type = 'body_cupping' THEN 2 END")
+                                                ->get();
+                                        @endphp
+                                        @if($hijamaSessionTypes->count() > 0)
+                                            @foreach($hijamaSessionTypes as $sessionType)
+                                                <div class="mb-2">
+                                                    <strong>{{ ucwords(str_replace('_', ' ', $sessionType->type)) }}</strong>
+                                                    @if($sessionType->fee)
+                                                        <br><span class="text-success font-weight-bold">Estimate Per Cup: {{ number_format($sessionType->fee, 2) }}</span>
+                                                    @endif
+                                                    @if($sessionType->min_duration && $sessionType->max_duration)
+                                                        &mdash; Duration: <span class="text-primary">{{ $sessionType->min_duration }}-{{ $sessionType->max_duration }} min</span>
+                                                    @endif
+                                                </div>
+                                            @endforeach
+                                        @else
+                                            <span class="text-muted">No Hijama session types available</span>
                                         @endif
                                     @else
-                                        <span class="text-muted">Not specified</span>
+                                        @php
+                                            $stypeName = $appointment->session_type_name ?? $appointment->sessionType->type ?? null;
+                                            $stypeFee = $appointment->session_type_fee ?? $appointment->sessionType->fee ?? null;
+                                            $stypeMin = $appointment->session_type_min_duration ?? $appointment->sessionType->min_duration ?? null;
+                                            $stypeMax = $appointment->session_type_max_duration ?? $appointment->sessionType->max_duration ?? null;
+                                        @endphp
+                                        @if($stypeName)
+                                            <strong>{{ ucwords(str_replace('_', ' ', $stypeName)) }}</strong>
+                                            @if($stypeFee)
+                                                &mdash; Fee: <span class="text-success">{{ number_format($stypeFee, 2) }}</span>
+                                            @endif
+                                            @if($stypeMin && $stypeMax)
+                                                &mdash; Duration: <span class="text-primary">{{ $stypeMin }}-{{ $stypeMax }} min</span>
+                                            @endif
+                                        @else
+                                            <span class="text-muted">Not specified</span>
+                                        @endif
                                     @endif
                                 </td>
                             </tr>

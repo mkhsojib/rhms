@@ -101,6 +101,13 @@ class AppointmentController extends Controller
         $sessionType = null;
         if ($request->session_type_id) {
             $sessionType = \App\Models\RaqiSessionType::find($request->session_type_id);
+        } elseif ($request->type === 'hijama') {
+            // For Hijama without session type selection, automatically use practitioner's default Hijama pricing
+            // Priority: Head Cupping first, then Body Cupping
+            $sessionType = \App\Models\RaqiSessionType::where('practitioner_id', $request->practitioner_id)
+                ->whereIn('type', ['head_cupping', 'body_cupping'])
+                ->orderByRaw("CASE WHEN type = 'head_cupping' THEN 1 WHEN type = 'body_cupping' THEN 2 END")
+                ->first();
         }
         
         // Calculate the end time based on the availability slot duration
@@ -122,9 +129,9 @@ class AppointmentController extends Controller
             'user_id' => $user->id,
             'practitioner_id' => $request->practitioner_id,
             'type' => $request->type,
-            'session_type_id' => $request->session_type_id, // Can be null for Hijama
+            'session_type_id' => $sessionType?->id, // Use auto-selected session type for Hijama
             'session_type_name' => $sessionType?->type,
-            'session_type_fee' => $sessionType?->fee ?? 0, // Default to 0 if no session type
+            'session_type_fee' => $sessionType?->fee ?? 0, // Use practitioner's pricing or default to 0
             'session_type_min_duration' => $sessionType?->min_duration,
             'session_type_max_duration' => $sessionType?->max_duration,
             'appointment_date' => $request->appointment_date,

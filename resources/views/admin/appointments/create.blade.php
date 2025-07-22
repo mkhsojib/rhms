@@ -586,6 +586,48 @@ document.addEventListener('DOMContentLoaded', function() {
         jsDebug.textContent = 'JavaScript loaded successfully - ' + new Date().toLocaleTimeString();
     }
     
+    // Treatment type change handler for Session Type visibility (matching patient behavior)
+    const treatmentTypeSelect = document.getElementById('type');
+    const sessionTypeGroup = document.querySelector('div:has(> label[for="session_type_id"])');
+    const sessionTypeSelect = document.getElementById('session_type_id');
+    
+    function updateSessionTypeVisibility() {
+        const selectedType = treatmentTypeSelect.value;
+        
+        if (selectedType === 'hijama') {
+            // Hide session type for Hijama (matching patient behavior)
+            if (sessionTypeGroup) {
+                sessionTypeGroup.style.display = 'none';
+            }
+            if (sessionTypeSelect) {
+                sessionTypeSelect.removeAttribute('required');
+            }
+        } else if (selectedType === 'ruqyah') {
+            // Show session type for Ruqyah
+            if (sessionTypeGroup) {
+                sessionTypeGroup.style.display = 'block';
+            }
+            if (sessionTypeSelect) {
+                sessionTypeSelect.setAttribute('required', 'required');
+            }
+        } else {
+            // Default: hide session type
+            if (sessionTypeGroup) {
+                sessionTypeGroup.style.display = 'none';
+            }
+            if (sessionTypeSelect) {
+                sessionTypeSelect.removeAttribute('required');
+            }
+        }
+    }
+    
+    // Add event listener for treatment type changes
+    if (treatmentTypeSelect) {
+        treatmentTypeSelect.addEventListener('change', updateSessionTypeVisibility);
+        // Initial call to set correct visibility
+        updateSessionTypeVisibility();
+    }
+    
     // Render available dates
     console.log('Calling renderAvailableDates...');
     renderAvailableDates();

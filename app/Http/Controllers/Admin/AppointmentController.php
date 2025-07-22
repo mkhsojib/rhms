@@ -89,17 +89,39 @@ class AppointmentController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
+        // Validate basic fields first
+        $rules = [
             'user_id' => 'required|exists:users,id',
             'type' => 'required|in:ruqyah,hijama',
-            'session_type_id' => 'required|exists:raqi_session_types,id',
             'appointment_date' => 'required|date_format:Y-m-d|after_or_equal:today',
             'appointment_time' => 'required|date_format:H:i',
             'symptoms' => 'nullable|string',
             'notes' => 'nullable|string',
-        ]);
+        ];
+        
+        // For Ruqyah, session_type_id is required
+        // For Hijama, session_type_id is optional
+        if ($request->type === 'ruqyah') {
+            $rules['session_type_id'] = 'required|exists:raqi_session_types,id';
+        } else if ($request->type === 'hijama') {
+            $rules['session_type_id'] = 'nullable|exists:raqi_session_types,id';
+        }
+        
+        $request->validate($rules);
 
         $practitioner_id = auth()->id();
+
+        // For Hijama without session type selection, automatically use practitioner's default Hijama pricing
+        if ($request->type === 'hijama' && !$request->session_type_id) {
+            $hijamaSessionType = \App\Models\RaqiSessionType::where('practitioner_id', $practitioner_id)
+                ->whereIn('type', ['head_cupping', 'body_cupping'])
+                ->orderByRaw("CASE WHEN type = 'head_cupping' THEN 1 WHEN type = 'body_cupping' THEN 2 END")
+                ->first();
+            
+            if ($hijamaSessionType) {
+                $request->merge(['session_type_id' => $hijamaSessionType->id]);
+            }
+        }
 
         // Enhanced duplicate booking prevention
         $existingAppointment = \App\Models\Appointment::where('practitioner_id', $practitioner_id)
@@ -255,17 +277,39 @@ class AppointmentController extends Controller
     {
         $this->authorize('update', $appointment);
 
-        $validated = $request->validate([
+        // Validate basic fields first
+        $rules = [
             'user_id' => 'required|exists:users,id',
             'type' => 'required|in:ruqyah,hijama',
-            'session_type_id' => 'required|exists:raqi_session_types,id',
             'appointment_date' => 'required|date_format:Y-m-d',
             'appointment_time' => 'required|date_format:H:i',
             'appointment_end_time' => 'required|date_format:H:i',
             'symptoms' => 'nullable|string',
             'status' => 'required|in:pending,approved,rejected,completed',
             'notes' => 'nullable|string',
-        ]);
+        ];
+        
+        // For Ruqyah, session_type_id is required
+        // For Hijama, session_type_id is optional
+        if ($request->type === 'ruqyah') {
+            $rules['session_type_id'] = 'required|exists:raqi_session_types,id';
+        } else if ($request->type === 'hijama') {
+            $rules['session_type_id'] = 'nullable|exists:raqi_session_types,id';
+        }
+        
+        $validated = $request->validate($rules);
+
+        // For Hijama without session type selection, automatically use practitioner's default Hijama pricing
+        if ($request->type === 'hijama' && !$request->session_type_id) {
+            $hijamaSessionType = \App\Models\RaqiSessionType::where('practitioner_id', auth()->id())
+                ->whereIn('type', ['head_cupping', 'body_cupping'])
+                ->orderByRaw("CASE WHEN type = 'head_cupping' THEN 1 WHEN type = 'body_cupping' THEN 2 END")
+                ->first();
+            
+            if ($hijamaSessionType) {
+                $validated['session_type_id'] = $hijamaSessionType->id;
+            }
+        }
 
         $validated['practitioner_id'] = auth()->id();
         $validated['updated_by'] = \Illuminate\Support\Facades\Auth::id();
@@ -279,6 +323,12 @@ class AppointmentController extends Controller
                 $validated['session_type_min_duration'] = $sessionType->min_duration;
                 $validated['session_type_max_duration'] = $sessionType->max_duration;
             }
+        } else {
+            // For Hijama without session type, set defaults
+            $validated['session_type_name'] = null;
+            $validated['session_type_fee'] = 0;
+            $validated['session_type_min_duration'] = null;
+            $validated['session_type_max_duration'] = null;
         }
         
         $appointment->update($validated);
@@ -365,5 +415,28 @@ class AppointmentController extends Controller
 
         return redirect()->route('admin.appointments.index')
             ->with('success', 'Appointment marked as completed.');
+    }
+
+    /**
+     * Get session types for AJAX requests
+     */
+    public function getSessionTypes(Request $request)
+    {
+        $practitionerId = $request->input('practitioner_id');
+        $treatmentType = $request->input('treatment_type');
+
+        if (!$practitionerId || !$treatmentType) {
+            return response()->json([]);
+        }
+
+        $query = \App\Models\RaqiSessionType::where('practitioner_id', $practitionerId);
+
+        if ($treatmentType === 'ruqyah') {
+            $query->whereIn('type', ['diagnosis', 'short', 'long']);
+        } elseif ($treatmentType === 'hijama') {
+            $query->whereIn('type', ['head_cupping', 'body_cupping']);
+        }
+
+        return response()->json($query->get());
     }
 }
