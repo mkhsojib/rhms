@@ -132,7 +132,14 @@
                                 <td>
                                     <div class="text-center">
                                         <div class="font-weight-bold">{{ $appointment->formatDate('M d, Y') }}</div>
-                                        <small class="text-muted">{{ $appointment->appointment_time }}</small>
+                                        <small class="text-muted">
+                                            @if($appointment->appointment_time)
+                                                {{ \Carbon\Carbon::parse($appointment->appointment_time)->format('g:i A') }}
+                                            @endif
+                                            @if($appointment->appointment_end_time)
+                                                - {{ \Carbon\Carbon::parse($appointment->appointment_end_time)->format('g:i A') }}
+                                            @endif
+                                        </small>
                                     </div>
                                 </td>
                                 <td>
