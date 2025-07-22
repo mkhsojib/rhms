@@ -531,16 +531,34 @@ document.addEventListener('DOMContentLoaded', function() {
     const hijamaFeeInfo = document.getElementById('hijama-fee-info');
 
     function updateSessionTypeOrEstimate() {
-        const treatmentType = document.querySelector('input[name="type"]:checked')?.value;
-        if (treatmentType === 'ruqyah' || treatmentType === 'hijama') {
+        const selectedType = document.querySelector('input[name="type"]:checked')?.value;
+        const practitionerId = practitionerSelect.value;
+        
+        if (selectedType === 'hijama') {
+            // For Hijama, hide session type section completely
+            sessionTypeSection.classList.add('hidden');
+            sessionTypeSelect.removeAttribute('required');
+            
+            if (practitionerId) {
+                fetchHijamaFee(practitionerId);
+                hijamaEstimateSection.classList.remove('hidden');
+            } else {
+                hijamaEstimateSection.classList.add('hidden');
+            }
+        } else if (selectedType === 'ruqyah') {
+            // For Ruqyah, show session type section
             sessionTypeSection.classList.remove('hidden');
-            sessionTypeSelect.required = true;
+            sessionTypeSelect.setAttribute('required', 'required');
             hijamaEstimateSection.classList.add('hidden');
         } else {
+            // Default case
             sessionTypeSection.classList.add('hidden');
             hijamaEstimateSection.classList.add('hidden');
         }
     }
+
+    // This function is no longer needed since we're hiding session types for Hijama
+    // function loadHijamaSessionTypes() { ... }
 
     function fetchHijamaFee(practitionerId) {
         fetch("{{ route('patient.appointments.getSessionTypes') }}", {
@@ -581,12 +599,25 @@ document.addEventListener('DOMContentLoaded', function() {
     updateSessionTypeOrEstimate();
 
     practitionerSelect.addEventListener('change', function() {
-        // Reset session type dropdown
+        const practitionerId = this.value;
+        const treatmentType = document.querySelector('input[name="type"]:checked')?.value;
+        
+        // For Hijama, session types are not shown, just update fee information
+        if (treatmentType === 'hijama') {
+            if (practitionerId) {
+                fetchHijamaFee(practitionerId);
+                hijamaEstimateSection.classList.remove('hidden');
+            } else {
+                hijamaEstimateSection.classList.add('hidden');
+            }
+            return;
+        }
+        
+        // For Ruqyah, proceed with normal practitioner-specific session type loading
         sessionTypeSelect.innerHTML = '<option value="">Select session type...</option>';
         sessionTypeSelect.disabled = true;
         sessionTypeInfo.textContent = '';
-        const practitionerId = this.value;
-        const treatmentType = document.querySelector('input[name="type"]:checked')?.value;
+        
         if (!practitionerId || !treatmentType) return;
 
         fetch("{{ route('patient.appointments.getSessionTypes') }}", {
@@ -600,8 +631,6 @@ document.addEventListener('DOMContentLoaded', function() {
             let allowedTypes = [];
             if (treatmentType === 'ruqyah') {
                 allowedTypes = ['diagnosis', 'short', 'long'];
-            } else if (treatmentType === 'hijama') {
-                allowedTypes = ['head_cupping', 'body_cupping'];
             }
             data.filter(type => allowedTypes.includes(type.type)).forEach(type => {
                 const option = new Option(

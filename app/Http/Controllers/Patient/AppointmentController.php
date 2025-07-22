@@ -67,14 +67,24 @@ class AppointmentController extends Controller
         // DEEP DEBUG: Log all incoming request data
         Log::info('FULL RAW REQUEST DATA', $request->all());
         
-        $request->validate([
+        // Validate basic fields first
+        $rules = [
             'practitioner_id' => 'required|exists:users,id',
             'type' => 'required|in:ruqyah,hijama',
-            'session_type_id' => 'required|exists:raqi_session_types,id',
             'appointment_date' => 'required|date_format:Y-m-d',
             'appointment_time' => 'required|date_format:H:i',
             'symptoms' => 'nullable|string',
-        ]);
+        ];
+        
+        // For Ruqyah, session_type_id is required
+        // For Hijama, session_type_id is optional
+        if ($request->type === 'ruqyah') {
+            $rules['session_type_id'] = 'required|exists:raqi_session_types,id';
+        } else if ($request->type === 'hijama') {
+            $rules['session_type_id'] = 'nullable|exists:raqi_session_types,id';
+        }
+        
+        $request->validate($rules);
         
         $user = Auth::user();
 
@@ -88,7 +98,10 @@ class AppointmentController extends Controller
             return back()->withErrors(['appointment_time' => 'This time slot is already booked for the selected practitioner. Please choose another.'])->withInput();
         }
         
-        $sessionType = \App\Models\RaqiSessionType::find($request->session_type_id);
+        $sessionType = null;
+        if ($request->session_type_id) {
+            $sessionType = \App\Models\RaqiSessionType::find($request->session_type_id);
+        }
         
         // Calculate the end time based on the availability slot duration
         $appointmentEndTime = null;
@@ -109,9 +122,9 @@ class AppointmentController extends Controller
             'user_id' => $user->id,
             'practitioner_id' => $request->practitioner_id,
             'type' => $request->type,
-            'session_type_id' => $request->session_type_id,
+            'session_type_id' => $request->session_type_id, // Can be null for Hijama
             'session_type_name' => $sessionType?->type,
-            'session_type_fee' => $sessionType?->fee,
+            'session_type_fee' => $sessionType?->fee ?? 0, // Default to 0 if no session type
             'session_type_min_duration' => $sessionType?->min_duration,
             'session_type_max_duration' => $sessionType?->max_duration,
             'appointment_date' => $request->appointment_date,
@@ -531,12 +544,22 @@ class AppointmentController extends Controller
     {
         $practitionerId = $request->input('practitioner_id');
         $treatmentType = $request->input('treatment_type');
+        $allPractitioners = $request->input('all_practitioners', false);
 
-        if (!$practitionerId || !$treatmentType) {
+        if (!$treatmentType) {
             return response()->json([]);
         }
 
-        $query = \App\Models\RaqiSessionType::where('practitioner_id', $practitionerId);
+        // If all_practitioners is true, fetch from all practitioners
+        if ($allPractitioners) {
+            $query = \App\Models\RaqiSessionType::query();
+        } else {
+            // Original behavior: require practitioner_id
+            if (!$practitionerId) {
+                return response()->json([]);
+            }
+            $query = \App\Models\RaqiSessionType::where('practitioner_id', $practitionerId);
+        }
 
         if ($treatmentType === 'ruqyah') {
             $query->whereIn('type', ['diagnosis', 'short', 'long']);
