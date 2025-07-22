@@ -46,6 +46,9 @@ class AppointmentController extends Controller
                         ->where('appointment_date', $date->availability_date)
                         ->where('status', '!=', 'cancelled')
                         ->pluck('appointment_time')
+                        ->map(function($time) {
+                            return \Carbon\Carbon::parse($time)->format('H:i');
+                        })
                         ->toArray();
                     
                     return [
