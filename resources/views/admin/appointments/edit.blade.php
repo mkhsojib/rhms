@@ -144,7 +144,11 @@
                                     <p class="text-muted text-center">Select a date to see available times</p>
                                 </div>
                                 <input type="hidden" name="appointment_time" id="appointment_time" value="{{ old('appointment_time', \Carbon\Carbon::parse($appointment->appointment_time)->format('H:i')) }}" required>
+                                <input type="hidden" name="appointment_end_time" id="appointment_end_time" value="{{ old('appointment_end_time', \Carbon\Carbon::parse($appointment->appointment_end_time)->format('H:i')) }}" required>
                                 @error('appointment_time')
+                                    <span class="invalid-feedback">{{ $message }}</span>
+                                @enderror
+                                @error('appointment_end_time')
                                     <span class="invalid-feedback">{{ $message }}</span>
                                 @enderror
                             </div>
@@ -306,6 +310,13 @@ function selectTime(timeStr) {
     console.log('Time selected:', timeStr);
     selectedTime = timeStr;
     document.getElementById('appointment_time').value = timeStr;
+    
+    // Calculate end time (1 hour after start time)
+    const [hour, minute] = timeStr.split(':').map(Number);
+    const endHour = (hour + 1) % 24;
+    const endTimeStr = `${String(endHour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+    document.getElementById('appointment_end_time').value = endTimeStr;
+    console.log('End time calculated:', endTimeStr);
     
     // Update visual selection
     document.querySelectorAll('.time-slot-btn').forEach(btn => {
