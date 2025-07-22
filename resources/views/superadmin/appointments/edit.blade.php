@@ -19,14 +19,8 @@
                     <div class="col-md-12">
                         <div class="form-group">
                             <label for="user_id">Patient *</label>
-                            <select name="user_id" id="user_id" class="form-control @error('user_id') is-invalid @enderror" required>
-                                <option value="">Select Patient</option>
-                                @foreach($patients as $patient)
-                                    <option value="{{ $patient->id }}" {{ old('user_id', $appointment->user_id) == $patient->id ? 'selected' : '' }}>
-                                        {{ $patient->name }} ({{ $patient->email }})
-                                    </option>
-                                @endforeach
-                            </select>
+                            <input type="text" class="form-control" value="{{ $patients->where('id', old('user_id', $appointment->user_id))->first()->name ?? 'Not selected' }} ({{ $patients->where('id', old('user_id', $appointment->user_id))->first()->email ?? '' }})" readonly>
+                            <input type="hidden" name="user_id" id="user_id" value="{{ old('user_id', $appointment->user_id) }}">
                             @error('user_id')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
@@ -38,11 +32,8 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="type">Treatment Type *</label>
-                            <select name="type" id="type" class="form-control @error('type') is-invalid @enderror" required>
-                                <option value="">Select Type</option>
-                                <option value="ruqyah" {{ old('type', $appointment->type) == 'ruqyah' ? 'selected' : '' }}>Ruqyah</option>
-                                <option value="hijama" {{ old('type', $appointment->type) == 'hijama' ? 'selected' : '' }}>Hijama</option>
-                            </select>
+                            <input type="text" class="form-control" value="{{ ucfirst(old('type', $appointment->type)) }}" readonly>
+                            <input type="hidden" name="type" id="type" value="{{ old('type', $appointment->type) }}">
                             @error('type')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
@@ -52,17 +43,8 @@
                     <div class="col-md-6">
                         <div class="form-group">
                             <label for="practitioner_id">Practitioner *</label>
-                            <select name="practitioner_id" id="practitioner_id" class="form-control @error('practitioner_id') is-invalid @enderror" required>
-                                <option value="">Select Practitioner</option>
-                                @foreach($practitioners as $practitioner)
-                                    <option value="{{ $practitioner->id }}" data-specialization="{{ $practitioner->specialization }}" {{ old('practitioner_id', $appointment->practitioner_id) == $practitioner->id ? 'selected' : '' }}>
-                                        {{ $practitioner->name }}
-                                        @if($practitioner->specialization)
-                                            ({{ $practitioner->specialization_label }})
-                                        @endif
-                                    </option>
-                                @endforeach
-                            </select>
+                            <input type="text" class="form-control" value="{{ $practitioners->where('id', old('practitioner_id', $appointment->practitioner_id))->first()->name ?? 'Not selected' }}" readonly>
+                            <input type="hidden" name="practitioner_id" id="practitioner_id" value="{{ old('practitioner_id', $appointment->practitioner_id) }}">
                             @error('practitioner_id')
                                 <span class="invalid-feedback">{{ $message }}</span>
                             @enderror
@@ -482,14 +464,8 @@ document.addEventListener('DOMContentLoaded', function() {
             renderAvailableDates();
         };
     }
-    // Practitioner change event
-    document.getElementById('practitioner_id').addEventListener('change', function() {
-        selectedPractitionerId = this.value;
-        renderAvailableDates();
-        document.getElementById('appointment_date').value = '';
-        document.getElementById('appointment_time').value = '';
-        document.getElementById('time-slots-container').innerHTML = '<p class="text-muted text-center">Select a date to see available times</p>';
-    });
+    // Set the selected practitioner ID from the hidden input
+    selectedPractitionerId = document.getElementById('practitioner_id').value;
     // Ensure form always submits the selected date/time and warn if missing
     document.querySelector('form').addEventListener('submit', function(e) {
         // Update hidden fields with current selections
