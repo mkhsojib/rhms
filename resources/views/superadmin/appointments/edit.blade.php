@@ -80,17 +80,29 @@
                                 <button type="button" id="next-month" class="btn btn-outline-secondary btn-sm">&gt;</button>
                             </div>
 
-                            <div id="availability-calendar" style="border: 2px solid #007bff; background: #f8f9fa; padding: 0; width: 100%; min-height: 200px;">
-                                <div class="calendar-header" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 8px; text-align: center;">
-                                    <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Sun</div>
-                                    <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Mon</div>
-                                    <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Tue</div>
-                                    <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Wed</div>
-                                    <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Thu</div>
-                                    <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Fri</div>
-                                    <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Sat</div>
+                            <div class="card mb-3">
+                                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                                    <span>Calendar</span>
+                                    <div>
+                                        <button type="button" id="prev-month" class="btn btn-sm btn-light mr-2">&lt;</button>
+                                        <span id="calendar-month-label">Month Year</span>
+                                        <button type="button" id="next-month" class="btn btn-sm btn-light ml-2">&gt;</button>
+                                    </div>
                                 </div>
-                                <div id="calendar-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 0 8px 8px 8px; text-align: center;"></div>
+                                <div class="card-body p-0">
+                                    <div id="availability-calendar" style="border: 2px solid #007bff; background: #f8f9fa; padding: 0; width: 100%; min-height: 200px;">
+                                        <div class="calendar-header" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 8px; text-align: center;">
+                                            <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Sun</div>
+                                            <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Mon</div>
+                                            <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Tue</div>
+                                            <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Wed</div>
+                                            <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Thu</div>
+                                            <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Fri</div>
+                                            <div class="day-header" style="font-weight: 600; padding: 8px 0; color: #495057; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; background-color: #e9ecef; border-radius: 4px; width: 100%;">Sat</div>
+                                        </div>
+                                        <div id="calendar-grid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 0 8px 8px 8px; text-align: center;"></div>
+                                    </div>
+                                </div>
                             </div>
                             <input type="hidden" name="appointment_date" id="appointment_date" value="{{ old('appointment_date', $appointment->appointment_date ? \Carbon\Carbon::parse($appointment->appointment_date)->format('Y-m-d') : '' ) }}" required>
                             @error('appointment_date')
@@ -119,7 +131,17 @@
                             <label for="session_type_id">Session Type *</label>
                             <select name="session_type_id" id="session_type_id" class="form-control @error('session_type_id') is-invalid @enderror" required>
                                 <option value="">Select Session Type</option>
-                                <!-- Session types will be populated via JavaScript -->
+                                @foreach($sessionTypes as $stype)
+                                    <option value="{{ $stype->id }}" 
+                                        data-practitioner="{{ $stype->practitioner_id }}" 
+                                        data-fee="{{ $stype->fee }}" 
+                                        data-min="{{ $stype->min_duration }}" 
+                                        data-max="{{ $stype->max_duration }}" 
+                                        {{ old('session_type_id', $appointment->session_type_id) == $stype->id ? 'selected' : '' }}
+                                        style="display: {{ $stype->practitioner_id == $appointment->practitioner_id ? 'block' : 'none' }}">
+                                        {{ ucfirst($stype->type) }} (Fee: {{ $stype->fee }}, Duration: {{ $stype->min_duration }}-{{ $stype->max_duration }} min)
+                                    </option>
+                                @endforeach
                             </select>
                             @error('session_type_id')
                                 <span class="invalid-feedback">{{ $message }}</span>
@@ -320,15 +342,16 @@ document.addEventListener('DOMContentLoaded', function() {
     function loadSessionTypesForPractitioner(practitionerId) {
         console.log('Loading session types for practitioner:', practitionerId);
         
-        // Clear current session types
-        sessionTypeSelect.innerHTML = '';
-        const defaultOption = document.createElement('option');
-        defaultOption.value = '';
-        defaultOption.textContent = 'Select Session Type';
-        sessionTypeSelect.appendChild(defaultOption);
-        
-        if (!practitionerId || !allSessionTypes || allSessionTypes.length === 0) {
-            console.log('No session types available or practitioner not selected');
+        if (!practitionerId) {
+            console.log('No practitioner selected');
+            // Hide all options except the default one
+            Array.from(sessionTypeSelect.options).forEach(option => {
+                if (option.value === '') {
+                    option.style.display = 'block';
+                } else {
+                    option.style.display = 'none';
+                }
+            });
             return;
         }
         
@@ -336,41 +359,51 @@ document.addEventListener('DOMContentLoaded', function() {
         const selectedType = typeSelect.value;
         console.log('Selected treatment type:', selectedType);
         
-        // Filter session types for this practitioner from flat array
-        const practitionerSessionTypes = allSessionTypes.filter(type => {
-            return parseInt(type.practitioner_id) === parseInt(practitionerId);
-        });
-        
-        console.log('Session types for practitioner:', practitionerSessionTypes);
-        
-        // Filter by treatment type if selected
-        const filteredSessionTypes = practitionerSessionTypes.filter(type => {
-            if (!selectedType) return true;
-            return type.type && type.type.toLowerCase().includes(selectedType.toLowerCase());
-        });
-        
-        console.log('Filtered session types for practitioner and type:', filteredSessionTypes);
-        
-        // If we have no session types after filtering, show all for this practitioner
-        const typesToShow = filteredSessionTypes.length > 0 ? filteredSessionTypes : practitionerSessionTypes;
-        
-        // Add session types to dropdown
-        typesToShow.forEach(type => {
-            const option = document.createElement('option');
-            option.value = type.id;
-            option.textContent = `${type.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} - Fee: ${type.fee}`;
-            
-            // Select the current appointment's session type
-            const currentSessionTypeId = '{{ old("session_type_id", $appointment->session_type_id) }}';
-            if (currentSessionTypeId && parseInt(type.id) === parseInt(currentSessionTypeId)) {
-                option.selected = true;
-                console.log('Selected session type:', type.id);
+        // Show/hide options based on practitioner
+        Array.from(sessionTypeSelect.options).forEach(option => {
+            if (option.value === '') {
+                // Always show the default option
+                option.style.display = 'block';
+                return;
             }
             
-            sessionTypeSelect.appendChild(option);
+            const optionPractitionerId = option.getAttribute('data-practitioner');
+            
+            // Check if this option belongs to the selected practitioner
+            const matchesPractitioner = optionPractitionerId && 
+                parseInt(optionPractitionerId) === parseInt(practitionerId);
+            
+            // If treatment type is selected, also filter by that
+            let matchesTreatmentType = true;
+            if (selectedType && option.textContent) {
+                matchesTreatmentType = option.textContent.toLowerCase().includes(selectedType.toLowerCase());
+            }
+            
+            // Show or hide based on filters
+            option.style.display = (matchesPractitioner && matchesTreatmentType) ? 'block' : 'none';
         });
         
-        console.log('Session types loaded:', typesToShow.length);
+        // Select the first visible option if none is selected
+        let hasVisibleSelected = false;
+        Array.from(sessionTypeSelect.options).forEach(option => {
+            if (option.style.display === 'block' && option.selected) {
+                hasVisibleSelected = true;
+            }
+        });
+        
+        // If no visible option is selected, select the first visible one (not the default)
+        if (!hasVisibleSelected) {
+            const firstVisibleOption = Array.from(sessionTypeSelect.options).find(option => {
+                return option.style.display === 'block' && option.value !== '';
+            });
+            
+            if (firstVisibleOption) {
+                firstVisibleOption.selected = true;
+                console.log('Auto-selected session type:', firstVisibleOption.value);
+            }
+        }
+        
+        console.log('Session types filtered for practitioner:', practitionerId);
     }
     
     function selectDate(dateStr) {
