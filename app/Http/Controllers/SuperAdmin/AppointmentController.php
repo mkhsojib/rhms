@@ -17,7 +17,7 @@ class AppointmentController extends Controller
      */
     public function index()
     {
-        $appointments = Appointment::with(['patient', 'practitioner'])
+        $appointments = Appointment::with(['patient', 'practitioner', 'sessionType'])
             ->orderBy('id', 'desc')
             ->paginate(15);
 
@@ -163,10 +163,80 @@ class AppointmentController extends Controller
      */
     public function edit(Appointment $appointment)
     {
-        $patients = User::where('role', 'patient')->get();
-        $practitioners = User::where('role', 'admin')->get();
-        $sessionTypes = RaqiSessionType::all();
-        return view('superadmin.appointments.edit', compact('appointment', 'patients', 'practitioners', 'sessionTypes'));
+        $patients = User::where('role', 'patient')->where('is_active', true)->get();
+        $practitioners = User::where('role', 'admin')->where('is_active', true)->get();
+        
+        // Get all session types grouped by practitioner
+        $sessionTypes = \App\Models\RaqiSessionType::all()->groupBy('practitioner_id')->map(function($group) {
+            return $group->toArray();
+        })->toArray();
+        
+        // Build available dates for all practitioners
+        $availableDates = [];
+        foreach ($practitioners as $practitioner) {
+            // Determine available treatment types based on specialization
+            $availableTypes = collect();
+            if ($practitioner->specialization === 'ruqyah_healing') {
+                $availableTypes = collect(['ruqyah']);
+            } elseif ($practitioner->specialization === 'hijama_cupping') {
+                $availableTypes = collect(['hijama']);
+            } elseif ($practitioner->specialization === 'both') {
+                $availableTypes = collect(['ruqyah', 'hijama']);
+            }
+            
+            // Get available dates for this practitioner
+            $dates = \App\Models\RaqiMonthlyAvailability::where('practitioner_id', $practitioner->id)
+                ->where('is_available', true)
+                ->where('availability_date', '>=', now()->toDateString()) // Only present and future dates
+                ->get()
+                ->map(function($date) use ($practitioner) {
+                    // Get booked times for this date, always format as H:i
+                    $bookedTimes = \App\Models\Appointment::where('practitioner_id', $practitioner->id)
+                        ->where('appointment_date', $date->availability_date)
+                        ->where('status', '!=', 'cancelled')
+                        ->pluck('appointment_time')
+                        ->map(function($time) {
+                            return \Carbon\Carbon::parse($time)->format('H:i');
+                        })
+                        ->toArray();
+                    
+                    return [
+                        'availability_date' => \Carbon\Carbon::parse($date->availability_date)->format('Y-m-d'),
+                        'is_available' => $date->is_available,
+                        'start_time' => \Carbon\Carbon::parse($date->start_time)->format('H:i'),
+                        'end_time' => \Carbon\Carbon::parse($date->end_time)->format('H:i'),
+                        'slot_duration' => $date->slot_duration,
+                        'booked_times' => $bookedTimes
+                    ];
+                })->toArray();
+            $availableDates[$practitioner->id] = $dates;
+        }
+        
+        // Get available treatment types for all practitioners
+        $availableTypes = [];
+        foreach ($practitioners as $practitioner) {
+            if ($practitioner->specialization === 'ruqyah_healing') {
+                $availableTypes[$practitioner->id] = ['ruqyah'];
+            } elseif ($practitioner->specialization === 'hijama_cupping') {
+                $availableTypes[$practitioner->id] = ['hijama'];
+            } elseif ($practitioner->specialization === 'both') {
+                $availableTypes[$practitioner->id] = ['ruqyah', 'hijama'];
+            } else {
+                $availableTypes[$practitioner->id] = [];
+            }
+        }
+        
+        $serverToday = now()->format('Y-m-d');
+        
+        return view('superadmin.appointments.edit', [
+            'appointment' => $appointment,
+            'patients' => $patients,
+            'practitioners' => $practitioners,
+            'sessionTypes' => $sessionTypes,
+            'availableDates' => $availableDates,
+            'availableTypes' => $availableTypes,
+            'serverToday' => $serverToday,
+        ]);
     }
 
     /**
@@ -178,6 +248,7 @@ class AppointmentController extends Controller
             'user_id' => 'required|exists:users,id',
             'practitioner_id' => 'required|exists:users,id',
             'type' => 'required|in:ruqyah,hijama',
+            'session_type_id' => 'required|exists:raqi_session_types,id',
             'appointment_date' => 'required|date',
             'appointment_time' => 'required|date_format:H:i',
             'symptoms' => 'nullable|string',
@@ -186,6 +257,18 @@ class AppointmentController extends Controller
         ]);
 
         $validated['updated_by'] = \Illuminate\Support\Facades\Auth::id();
+        
+        // If session_type_id is provided, also update the session type details
+        if (!empty($validated['session_type_id'])) {
+            $sessionType = \App\Models\RaqiSessionType::find($validated['session_type_id']);
+            if ($sessionType) {
+                $validated['session_type_name'] = $sessionType->type;
+                $validated['session_type_fee'] = $sessionType->fee;
+                $validated['session_type_min_duration'] = $sessionType->min_duration;
+                $validated['session_type_max_duration'] = $sessionType->max_duration;
+            }
+        }
+        
         $appointment->update($validated);
 
         return redirect()->route('superadmin.appointments.index')

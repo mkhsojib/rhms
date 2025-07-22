@@ -128,6 +128,15 @@
                                         @default
                                             <span class="badge badge-secondary">{{ ucfirst($appointment->type) }}</span>
                                     @endswitch
+                                    @php
+                                        $sessionTypeName = $appointment->session_type_name ?? $appointment->sessionType->type ?? $appointment->sessionType->name ?? null;
+                                    @endphp
+                                    @if($sessionTypeName)
+                                        <br>
+                                        <small class="text-muted">
+                                            <strong>Session:</strong> {{ ucwords(str_replace('_', ' ', $sessionTypeName)) }}
+                                        </small>
+                                    @endif
                                 </td>
                                 <td>
                                     <div class="text-center">

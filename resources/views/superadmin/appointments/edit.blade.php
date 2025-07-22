@@ -304,29 +304,43 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Clear current session types
         sessionTypeSelect.innerHTML = '';
-        sessionTypeSelect.appendChild(document.createElement('option')).textContent = 'Select Session Type';
+        const defaultOption = document.createElement('option');
+        defaultOption.value = '';
+        defaultOption.textContent = 'Select Session Type';
+        sessionTypeSelect.appendChild(defaultOption);
         
         if (!practitionerId || !allSessionTypes) return;
         
         // Get selected treatment type
         const selectedType = typeSelect.value;
         
-        // Filter session types for this practitioner and treatment type
-        const practitionerSessionTypes = allSessionTypes.filter(type => {
-            return type.practitioner_id == practitionerId && 
-                   (!selectedType || type.type.includes(selectedType));
+        // Get session types for this practitioner (data is grouped by practitioner_id)
+        const practitionerSessionTypes = allSessionTypes[practitionerId] || [];
+        
+        console.log('Session types for practitioner:', practitionerSessionTypes);
+        
+        // Filter by treatment type if selected
+        const filteredSessionTypes = practitionerSessionTypes.filter(type => {
+            if (!selectedType) return true;
+            return type.type && type.type.toLowerCase().includes(selectedType.toLowerCase());
         });
         
-        console.log('Filtered session types for practitioner and type:', practitionerSessionTypes);
+        console.log('Filtered session types for practitioner and type:', filteredSessionTypes);
         
-        practitionerSessionTypes.forEach(type => {
+        filteredSessionTypes.forEach(type => {
             const option = document.createElement('option');
             option.value = type.id;
-            option.textContent = `${type.type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())} (Fee: ${type.fee})`;
+            option.textContent = `${type.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} - Fee: ${type.fee}`;
+            
+            // Select the current appointment's session type
+            if (type.id == '{{ old('session_type_id', $appointment->session_type_id) }}') {
+                option.selected = true;
+            }
+            
             sessionTypeSelect.appendChild(option);
         });
         
-        console.log('Session types loaded:', practitionerSessionTypes.length);
+        console.log('Session types loaded:', filteredSessionTypes.length);
     }
     
     function selectDate(dateStr) {

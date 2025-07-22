@@ -42,7 +42,11 @@
                             </div>
                             <div class="form-group">
                                 <label>Session Price</label>
-                                <input type="number" step="0.01" min="0" name="amount" id="ruqyah_amount" class="form-control" value="{{ $invoice->amount }}" required>
+                                @php
+                                    // Use current session type fee from appointment, fallback to invoice amount
+                                    $currentSessionFee = $invoice->appointment->session_type_fee ?? $invoice->appointment->sessionType->fee ?? $invoice->amount;
+                                @endphp
+                                <input type="number" step="0.01" min="0" name="amount" id="ruqyah_amount" class="form-control" value="{{ $currentSessionFee }}" required>
                             </div>
                             <div class="form-group">
                                 <label>Discount</label>
@@ -50,7 +54,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Total</label>
-                                <input type="number" step="0.01" min="0" name="paid_amount" id="ruqyah_total" class="form-control" value="{{ $invoice->amount }}" readonly>
+                                <input type="number" step="0.01" min="0" name="paid_amount" id="ruqyah_total" class="form-control" value="{{ $currentSessionFee }}" readonly>
                             </div>
                         @elseif($invoice->appointment->type === 'hijama')
                             <div class="form-group">
