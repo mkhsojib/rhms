@@ -111,15 +111,36 @@ class AppointmentController extends Controller
 
         $practitioner_id = auth()->id();
 
-        // For Hijama without session type selection, automatically use practitioner's default Hijama pricing
+        // For Hijama appointments, get both Head Cupping and Body Cupping pricing to store in appointments table
+        $headCuppingData = null;
+        $bodyCuppingData = null;
+        
         if ($request->type === 'hijama' && !$request->session_type_id) {
-            $hijamaSessionType = \App\Models\RaqiSessionType::where('practitioner_id', $practitioner_id)
+            $hijamaSessionTypes = \App\Models\RaqiSessionType::where('practitioner_id', $practitioner_id)
                 ->whereIn('type', ['head_cupping', 'body_cupping'])
-                ->orderByRaw("CASE WHEN type = 'head_cupping' THEN 1 WHEN type = 'body_cupping' THEN 2 END")
-                ->first();
+                ->get();
+                
+            // Debug: Log what we found in admin controller
+            \Log::info('Admin Hijama Session Types Query', [
+                'practitioner_id' => $practitioner_id,
+                'found_types' => $hijamaSessionTypes->pluck('type', 'id')->toArray(),
+                'count' => $hijamaSessionTypes->count()
+            ]);
+                
+            foreach ($hijamaSessionTypes as $hijamaType) {
+                if ($hijamaType->type === 'head_cupping') {
+                    $headCuppingData = $hijamaType;
+                    \Log::info('Admin Found Head Cupping', ['fee' => $hijamaType->fee, 'id' => $hijamaType->id]);
+                } elseif ($hijamaType->type === 'body_cupping') {
+                    $bodyCuppingData = $hijamaType;
+                    \Log::info('Admin Found Body Cupping', ['fee' => $hijamaType->fee, 'id' => $hijamaType->id]);
+                }
+            }
             
-            if ($hijamaSessionType) {
-                $request->merge(['session_type_id' => $hijamaSessionType->id]);
+            // Set session type to Head Cupping as primary (for backward compatibility)
+            $primarySessionType = $headCuppingData ?: $bodyCuppingData;
+            if ($primarySessionType) {
+                $request->merge(['session_type_id' => $primarySessionType->id]);
             }
         }
 
@@ -160,13 +181,13 @@ class AppointmentController extends Controller
             $appointmentEndTime = $endTime->format('H:i');
         }
 
-        $appointment = \App\Models\Appointment::create([
+        $appointmentData = [
             'appointment_no' => \App\Models\Appointment::generateAppointmentNo($request->type),
             'user_id' => $request->user_id,
             'practitioner_id' => $practitioner_id,
             'type' => $request->type,
             'session_type_id' => $request->session_type_id,
-            'session_type_name' => $sessionType?->type,
+            'session_type_name' => $request->type === 'hijama' ? 'hijama' : $sessionType?->type,
             'session_type_fee' => $sessionType?->fee,
             'session_type_min_duration' => $sessionType?->min_duration,
             'session_type_max_duration' => $sessionType?->max_duration,
@@ -177,7 +198,29 @@ class AppointmentController extends Controller
             'notes' => $request->notes,
             'status' => 'pending',
             'created_by' => auth()->id(),
-        ]);
+        ];
+        
+        // Add Hijama-specific pricing fields if this is a Hijama appointment
+        if ($request->type === 'hijama') {
+            $appointmentData['head_cupping_fee'] = $headCuppingData?->fee;
+            $appointmentData['head_cupping_min_duration'] = $headCuppingData?->min_duration;
+            $appointmentData['head_cupping_max_duration'] = $headCuppingData?->max_duration;
+            $appointmentData['body_cupping_fee'] = $bodyCuppingData?->fee;
+            $appointmentData['body_cupping_min_duration'] = $bodyCuppingData?->min_duration;
+            $appointmentData['body_cupping_max_duration'] = $bodyCuppingData?->max_duration;
+            
+            // Debug: Log what we're storing in admin
+            \Log::info('Admin Storing Hijama Pricing Data', [
+                'head_cupping_fee' => $appointmentData['head_cupping_fee'],
+                'head_cupping_min_duration' => $appointmentData['head_cupping_min_duration'],
+                'head_cupping_max_duration' => $appointmentData['head_cupping_max_duration'],
+                'body_cupping_fee' => $appointmentData['body_cupping_fee'],
+                'body_cupping_min_duration' => $appointmentData['body_cupping_min_duration'],
+                'body_cupping_max_duration' => $appointmentData['body_cupping_max_duration']
+            ]);
+        }
+        
+        $appointment = \App\Models\Appointment::create($appointmentData);
 
         // Create invoice after appointment
         $invoiceNo = 'INV-' . date('Ymd') . '-' . rand(1000, 9999);
@@ -299,15 +342,27 @@ class AppointmentController extends Controller
         
         $validated = $request->validate($rules);
 
-        // For Hijama without session type selection, automatically use practitioner's default Hijama pricing
+        // For Hijama appointments, get both Head Cupping and Body Cupping pricing to store in appointments table
+        $headCuppingData = null;
+        $bodyCuppingData = null;
+        
         if ($request->type === 'hijama' && !$request->session_type_id) {
-            $hijamaSessionType = \App\Models\RaqiSessionType::where('practitioner_id', auth()->id())
+            $hijamaSessionTypes = \App\Models\RaqiSessionType::where('practitioner_id', auth()->id())
                 ->whereIn('type', ['head_cupping', 'body_cupping'])
-                ->orderByRaw("CASE WHEN type = 'head_cupping' THEN 1 WHEN type = 'body_cupping' THEN 2 END")
-                ->first();
+                ->get();
+                
+            foreach ($hijamaSessionTypes as $hijamaType) {
+                if ($hijamaType->type === 'head_cupping') {
+                    $headCuppingData = $hijamaType;
+                } elseif ($hijamaType->type === 'body_cupping') {
+                    $bodyCuppingData = $hijamaType;
+                }
+            }
             
-            if ($hijamaSessionType) {
-                $validated['session_type_id'] = $hijamaSessionType->id;
+            // Set session type to Head Cupping as primary (for backward compatibility)
+            $primarySessionType = $headCuppingData ?: $bodyCuppingData;
+            if ($primarySessionType) {
+                $validated['session_type_id'] = $primarySessionType->id;
             }
         }
 
@@ -318,17 +373,27 @@ class AppointmentController extends Controller
         if (!empty($validated['session_type_id'])) {
             $sessionType = \App\Models\RaqiSessionType::find($validated['session_type_id']);
             if ($sessionType) {
-                $validated['session_type_name'] = $sessionType->type;
+                $validated['session_type_name'] = $request->type === 'hijama' ? 'hijama' : $sessionType->type;
                 $validated['session_type_fee'] = $sessionType->fee;
                 $validated['session_type_min_duration'] = $sessionType->min_duration;
                 $validated['session_type_max_duration'] = $sessionType->max_duration;
             }
         } else {
             // For Hijama without session type, set defaults
-            $validated['session_type_name'] = null;
+            $validated['session_type_name'] = $request->type === 'hijama' ? 'hijama' : null;
             $validated['session_type_fee'] = 0;
             $validated['session_type_min_duration'] = null;
             $validated['session_type_max_duration'] = null;
+        }
+        
+        // Add Hijama-specific pricing fields if this is a Hijama appointment
+        if ($request->type === 'hijama') {
+            $validated['head_cupping_fee'] = $headCuppingData?->fee;
+            $validated['head_cupping_min_duration'] = $headCuppingData?->min_duration;
+            $validated['head_cupping_max_duration'] = $headCuppingData?->max_duration;
+            $validated['body_cupping_fee'] = $bodyCuppingData?->fee;
+            $validated['body_cupping_min_duration'] = $bodyCuppingData?->min_duration;
+            $validated['body_cupping_max_duration'] = $bodyCuppingData?->max_duration;
         }
         
         $appointment->update($validated);

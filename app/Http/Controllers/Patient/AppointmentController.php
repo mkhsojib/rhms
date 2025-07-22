@@ -99,15 +99,36 @@ class AppointmentController extends Controller
         }
         
         $sessionType = null;
+        $headCuppingData = null;
+        $bodyCuppingData = null;
+        
         if ($request->session_type_id) {
             $sessionType = \App\Models\RaqiSessionType::find($request->session_type_id);
         } elseif ($request->type === 'hijama') {
-            // For Hijama without session type selection, automatically use practitioner's default Hijama pricing
-            // Priority: Head Cupping first, then Body Cupping
-            $sessionType = \App\Models\RaqiSessionType::where('practitioner_id', $request->practitioner_id)
+            // For Hijama, get both Head Cupping and Body Cupping pricing to store in appointments table
+            $hijamaSessionTypes = \App\Models\RaqiSessionType::where('practitioner_id', $request->practitioner_id)
                 ->whereIn('type', ['head_cupping', 'body_cupping'])
-                ->orderByRaw("CASE WHEN type = 'head_cupping' THEN 1 WHEN type = 'body_cupping' THEN 2 END")
-                ->first();
+                ->get();
+                
+            // Debug: Log what we found
+            \Log::info('Hijama Session Types Query', [
+                'practitioner_id' => $request->practitioner_id,
+                'found_types' => $hijamaSessionTypes->pluck('type', 'id')->toArray(),
+                'count' => $hijamaSessionTypes->count()
+            ]);
+                
+            foreach ($hijamaSessionTypes as $hijamaType) {
+                if ($hijamaType->type === 'head_cupping') {
+                    $headCuppingData = $hijamaType;
+                    \Log::info('Found Head Cupping', ['fee' => $hijamaType->fee, 'id' => $hijamaType->id]);
+                } elseif ($hijamaType->type === 'body_cupping') {
+                    $bodyCuppingData = $hijamaType;
+                    \Log::info('Found Body Cupping', ['fee' => $hijamaType->fee, 'id' => $hijamaType->id]);
+                }
+            }
+            
+            // Set session type to Head Cupping as primary (for backward compatibility)
+            $sessionType = $headCuppingData ?: $bodyCuppingData;
         }
         
         // Calculate the end time based on the availability slot duration
@@ -124,13 +145,13 @@ class AppointmentController extends Controller
             $appointmentEndTime = $endTime->format('H:i');
         }
         
-        $appointment = Appointment::create([
+        $appointmentData = [
             'appointment_no' => Appointment::generateAppointmentNo($request->type),
             'user_id' => $user->id,
             'practitioner_id' => $request->practitioner_id,
             'type' => $request->type,
             'session_type_id' => $sessionType?->id, // Use auto-selected session type for Hijama
-            'session_type_name' => $sessionType?->type,
+            'session_type_name' => $request->type === 'hijama' ? 'hijama' : $sessionType?->type,
             'session_type_fee' => $sessionType?->fee ?? 0, // Use practitioner's pricing or default to 0
             'session_type_min_duration' => $sessionType?->min_duration,
             'session_type_max_duration' => $sessionType?->max_duration,
@@ -140,7 +161,29 @@ class AppointmentController extends Controller
             'symptoms' => $request->symptoms,
             'status' => 'pending',
             'created_by' => $user->id,
-        ]);
+        ];
+        
+        // Add Hijama-specific pricing fields if this is a Hijama appointment
+        if ($request->type === 'hijama') {
+            $appointmentData['head_cupping_fee'] = $headCuppingData?->fee;
+            $appointmentData['head_cupping_min_duration'] = $headCuppingData?->min_duration;
+            $appointmentData['head_cupping_max_duration'] = $headCuppingData?->max_duration;
+            $appointmentData['body_cupping_fee'] = $bodyCuppingData?->fee;
+            $appointmentData['body_cupping_min_duration'] = $bodyCuppingData?->min_duration;
+            $appointmentData['body_cupping_max_duration'] = $bodyCuppingData?->max_duration;
+            
+            // Debug: Log what we're storing
+            \Log::info('Storing Hijama Pricing Data', [
+                'head_cupping_fee' => $appointmentData['head_cupping_fee'],
+                'head_cupping_min_duration' => $appointmentData['head_cupping_min_duration'],
+                'head_cupping_max_duration' => $appointmentData['head_cupping_max_duration'],
+                'body_cupping_fee' => $appointmentData['body_cupping_fee'],
+                'body_cupping_min_duration' => $appointmentData['body_cupping_min_duration'],
+                'body_cupping_max_duration' => $appointmentData['body_cupping_max_duration']
+            ]);
+        }
+        
+        $appointment = Appointment::create($appointmentData);
 
         // Create invoice after appointment
         $invoiceNo = 'INV-' . date('Ymd') . '-' . rand(1000, 9999);

@@ -98,27 +98,31 @@
                                 <td><strong>Session Type:</strong></td>
                                 <td>
                                     @if($appointment->type === 'hijama')
-                                        @php
-                                            // For Hijama, show both Head Cupping and Body Cupping pricing from practitioner
-                                            $hijamaSessionTypes = \App\Models\RaqiSessionType::where('practitioner_id', $appointment->practitioner_id)
-                                                ->whereIn('type', ['head_cupping', 'body_cupping'])
-                                                ->orderByRaw("CASE WHEN type = 'head_cupping' THEN 1 WHEN type = 'body_cupping' THEN 2 END")
-                                                ->get();
-                                        @endphp
-                                        @if($hijamaSessionTypes->count() > 0)
-                                            @foreach($hijamaSessionTypes as $sessionType)
-                                                <div class="mb-2">
-                                                    <strong>{{ ucwords(str_replace('_', ' ', $sessionType->type)) }}</strong>
-                                                    @if($sessionType->fee)
-                                                        <br><span class="text-success font-weight-bold">Estimate Per Cup: {{ number_format($sessionType->fee, 2) }}</span>
-                                                    @endif
-                                                    @if($sessionType->min_duration && $sessionType->max_duration)
-                                                        &mdash; Duration: <span class="text-primary">{{ $sessionType->min_duration }}-{{ $sessionType->max_duration }} min</span>
-                                                    @endif
-                                                </div>
-                                            @endforeach
-                                        @else
-                                            <span class="text-muted">No Hijama session types available</span>
+                                        {{-- Display Head Cupping pricing from appointments table --}}
+                                        @if($appointment->head_cupping_fee)
+                                            <div class="mb-2">
+                                                <strong>Head Cupping</strong>
+                                                <br><span class="text-success font-weight-bold">Estimate Per Cup: {{ number_format($appointment->head_cupping_fee, 2) }}</span>
+                                                @if($appointment->head_cupping_min_duration && $appointment->head_cupping_max_duration)
+                                                    &mdash; Duration: <span class="text-primary">{{ $appointment->head_cupping_min_duration }}-{{ $appointment->head_cupping_max_duration }} min</span>
+                                                @endif
+                                            </div>
+                                        @endif
+                                        
+                                        {{-- Display Body Cupping pricing from appointments table --}}
+                                        @if($appointment->body_cupping_fee)
+                                            <div class="mb-2">
+                                                <strong>Body Cupping</strong>
+                                                <br><span class="text-success font-weight-bold">Estimate Per Cup: {{ number_format($appointment->body_cupping_fee, 2) }}</span>
+                                                @if($appointment->body_cupping_min_duration && $appointment->body_cupping_max_duration)
+                                                    &mdash; Duration: <span class="text-primary">{{ $appointment->body_cupping_min_duration }}-{{ $appointment->body_cupping_max_duration }} min</span>
+                                                @endif
+                                            </div>
+                                        @endif
+                                        
+                                        {{-- Fallback if no Hijama pricing is stored --}}
+                                        @if(!$appointment->head_cupping_fee && !$appointment->body_cupping_fee)
+                                            <span class="text-muted">No Hijama pricing available</span>
                                         @endif
                                     @else
                                         @php

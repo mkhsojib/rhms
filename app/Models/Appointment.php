@@ -35,7 +35,13 @@ class Appointment extends Model
         'rejection_reason',
         'cancelled_at',
         'cancelled_by',
-        'cancellation_reason'
+        'cancellation_reason',
+        'head_cupping_fee',
+        'head_cupping_min_duration',
+        'head_cupping_max_duration',
+        'body_cupping_fee',
+        'body_cupping_min_duration',
+        'body_cupping_max_duration',
     ];
     
     // Status constants
