@@ -82,6 +82,7 @@
                             <th>Type</th>
                             <th>Date & Time</th>
                             <th>Status</th>
+                            <th>Payment Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -151,6 +152,17 @@
                                         @default
                                             <span class="badge badge-secondary">{{ ucfirst($appointment->status) }}</span>
                                     @endswitch
+                                </td>
+                                <td>
+                                    @if($appointment->invoice)
+                                        @if($appointment->invoice->status === 'paid')
+                                            <span class="badge badge-success">Paid</span>
+                                        @else
+                                            <span class="badge badge-warning">Unpaid</span>
+                                        @endif
+                                    @else
+                                        <span class="badge badge-secondary">N/A</span>
+                                    @endif
                                 </td>
                                 <td>
                                     <div class="btn-group" role="group">
