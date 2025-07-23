@@ -31,6 +31,13 @@ class AppointmentController extends Controller
             });
         }
         
+        // Search by Patient Phone
+        if ($request->filled('patient_phone')) {
+            $query->whereHas('patient', function($q) use ($request) {
+                $q->where('phone', 'like', '%' . $request->patient_phone . '%');
+            });
+        }
+        
         // Filter by Payment Status
         if ($request->filled('payment_status')) {
             if ($request->payment_status === 'paid') {

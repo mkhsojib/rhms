@@ -83,8 +83,14 @@
                     </div>
                     <div class="col-md-2">
                         <div class="form-group">
-                            <label for="patient_name">Patient</label>
+                            <label for="patient_name">Patient Name</label>
                             <input type="text" name="patient_name" id="patient_name" class="form-control form-control-sm" value="{{ request('patient_name') }}">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="patient_phone">Patient Phone</label>
+                            <input type="text" name="patient_phone" id="patient_phone" class="form-control form-control-sm" value="{{ request('patient_phone') }}">
                         </div>
                     </div>
                     <div class="col-md-2">
