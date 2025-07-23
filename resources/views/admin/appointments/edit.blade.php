@@ -621,6 +621,29 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             if (sessionTypeSelect) {
                 sessionTypeSelect.setAttribute('required', 'required');
+                
+                // Filter session types to only show Ruqyah types (diagnosis, short, long)
+                // and hide Hijama types (head_cupping, body_cupping)
+                const options = sessionTypeSelect.options;
+                for (let i = 0; i < options.length; i++) {
+                    const optionText = options[i].text.toLowerCase();
+                    // Hide Hijama session types
+                    if (optionText.includes('head_cupping') || optionText.includes('body_cupping') || 
+                        optionText.includes('head cupping') || optionText.includes('body cupping')) {
+                        options[i].style.display = 'none';
+                    } else {
+                        options[i].style.display = 'block';
+                    }
+                }
+                
+                // Reset selection if a hidden option was selected
+                if (sessionTypeSelect.selectedIndex > 0) {
+                    const selectedText = options[sessionTypeSelect.selectedIndex].text.toLowerCase();
+                    if (selectedText.includes('head_cupping') || selectedText.includes('body_cupping') || 
+                        selectedText.includes('head cupping') || selectedText.includes('body cupping')) {
+                        sessionTypeSelect.selectedIndex = 0;
+                    }
+                }
             }
         } else {
             // Default: hide session type
