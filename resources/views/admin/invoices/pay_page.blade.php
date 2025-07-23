@@ -59,7 +59,7 @@
                         @elseif($invoice->appointment->type === 'hijama')
                             <div class="form-group">
                                 <label>Head Cup Price</label>
-                                <input type="number" step="0.01" min="0" id="head_cup_price" name="head_cup_price" class="form-control" value="{{ $invoice->amount }}">
+                                <input type="number" step="0.01" min="0" id="head_cup_price" name="head_cup_price" class="form-control" value="{{ $invoice->appointment->head_cupping_fee ?? 0 }}">
                             </div>
                             <div class="form-group">
                                 <label>Head Cup Qty</label>
@@ -67,7 +67,7 @@
                             </div>
                             <div class="form-group">
                                 <label>Body Cup Price</label>
-                                <input type="number" step="0.01" min="0" id="body_cup_price" name="body_cup_price" class="form-control" value="{{ $invoice->amount }}">
+                                <input type="number" step="0.01" min="0" id="body_cup_price" name="body_cup_price" class="form-control" value="{{ $invoice->appointment->body_cupping_fee ?? 0 }}">
                             </div>
                             <div class="form-group">
                                 <label>Body Cup Qty</label>
