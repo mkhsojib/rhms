@@ -13,6 +13,51 @@
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
+    
+    <!-- Settings Group Navigation Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-cog fa-3x mb-3 text-primary"></i>
+                    <h5>General Settings</h5>
+                    <p class="text-muted">Site name, contact info, etc.</p>
+                    <a href="{{ route('superadmin.settings.general') }}" class="btn btn-primary btn-block">Manage</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-paint-brush fa-3x mb-3 text-success"></i>
+                    <h5>Appearance Settings</h5>
+                    <p class="text-muted">Logo, colors, theme options</p>
+                    <a href="{{ route('superadmin.settings.appearance') }}" class="btn btn-success btn-block">Manage</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-server fa-3x mb-3 text-warning"></i>
+                    <h5>System Settings</h5>
+                    <p class="text-muted">Maintenance, registration, etc.</p>
+                    <a href="{{ route('superadmin.settings.system') }}" class="btn btn-warning btn-block">Manage</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card">
+                <div class="card-body text-center">
+                    <i class="fas fa-briefcase fa-3x mb-3 text-info"></i>
+                    <h5>Business Settings</h5>
+                    <p class="text-muted">Currency, business hours, fees</p>
+                    <a href="{{ route('superadmin.settings.business') }}" class="btn btn-info btn-block">Manage</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Settings Group Navigation Cards -->
     @foreach($settings as $group => $groupSettings)
         <div class="card mb-4">
             <div class="card-header bg-light">
