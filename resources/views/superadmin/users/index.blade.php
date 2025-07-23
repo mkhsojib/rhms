@@ -22,6 +22,68 @@
                 <i class="fas fa-plus"></i> Add New User
             </a>
         </div>
+        
+        <!-- Search Form -->
+        <div class="card-body border-bottom">
+            <form action="{{ route('superadmin.users.index') }}" method="GET" class="mb-0">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" name="name" id="name" class="form-control form-control-sm" value="{{ request('name') }}">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="text" name="email" id="email" class="form-control form-control-sm" value="{{ request('email') }}">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="role">Role</label>
+                            <select name="role" id="role" class="form-control form-control-sm">
+                                <option value="">All Roles</option>
+                                <option value="super_admin" {{ request('role') == 'super_admin' ? 'selected' : '' }}>Super Admin</option>
+                                <option value="admin" {{ request('role') == 'admin' ? 'selected' : '' }}>Admin (Raqi)</option>
+                                <option value="patient" {{ request('role') == 'patient' ? 'selected' : '' }}>Patient</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="specialization">Specialization</label>
+                            <select name="specialization" id="specialization" class="form-control form-control-sm">
+                                <option value="">All</option>
+                                <option value="ruqyah_healing" {{ request('specialization') == 'ruqyah_healing' ? 'selected' : '' }}>Ruqyah Healing</option>
+                                <option value="hijama_cupping" {{ request('specialization') == 'hijama_cupping' ? 'selected' : '' }}>Hijama Cupping</option>
+                                <option value="both" {{ request('specialization') == 'both' ? 'selected' : '' }}>Both</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select name="status" id="status" class="form-control form-control-sm">
+                                <option value="">All</option>
+                                <option value="active" {{ request('status') == 'active' ? 'selected' : '' }}>Active</option>
+                                <option value="inactive" {{ request('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <div class="form-group mb-0">
+                            <button type="submit" class="btn btn-primary btn-sm mr-2">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                            <a href="{{ route('superadmin.users.index') }}" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-sync"></i> Reset
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered table-striped">

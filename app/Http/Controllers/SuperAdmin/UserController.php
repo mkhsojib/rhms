@@ -14,9 +14,40 @@ class UserController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::paginate(10);
+        $query = User::query();
+        
+        // Search by name
+        if ($request->filled('name')) {
+            $query->where('name', 'like', '%' . $request->name . '%');
+        }
+        
+        // Search by email
+        if ($request->filled('email')) {
+            $query->where('email', 'like', '%' . $request->email . '%');
+        }
+        
+        // Filter by role
+        if ($request->filled('role')) {
+            $query->where('role', $request->role);
+        }
+        
+        // Filter by specialization
+        if ($request->filled('specialization')) {
+            $query->where('specialization', $request->specialization);
+        }
+        
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('is_active', $request->status == 'active');
+        }
+        
+        $users = $query->paginate(10);
+        
+        // Preserve query parameters in pagination links
+        $users->appends($request->all());
+        
         return view('superadmin.users.index', compact('users'));
     }
 
