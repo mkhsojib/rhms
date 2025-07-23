@@ -13,13 +13,62 @@ class AppointmentController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $appointments = Appointment::with(['patient', 'practitioner', 'sessionType'])
-            ->where('practitioner_id', \Illuminate\Support\Facades\Auth::id())
-            ->orderBy('id', 'desc')
-            ->paginate(15);
-
+        $query = Appointment::with(['patient', 'practitioner', 'sessionType', 'invoice'])
+            ->where('practitioner_id', \Illuminate\Support\Facades\Auth::id());
+            
+        // Search by Appointment No
+        if ($request->filled('appointment_no')) {
+            $query->where('appointment_no', 'like', '%' . $request->appointment_no . '%');
+        }
+        
+        // Search by Patient Name
+        if ($request->filled('patient_name')) {
+            $query->whereHas('patient', function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->patient_name . '%');
+            });
+        }
+        
+        // Filter by Payment Status
+        if ($request->filled('payment_status')) {
+            if ($request->payment_status === 'paid') {
+                $query->whereHas('invoice', function($q) {
+                    $q->where('status', 'paid');
+                });
+            } elseif ($request->payment_status === 'unpaid') {
+                $query->whereHas('invoice', function($q) {
+                    $q->where('status', '!=', 'paid');
+                });
+            } elseif ($request->payment_status === 'no_invoice') {
+                $query->doesntHave('invoice');
+            }
+        }
+        
+        // Filter by Treatment Type
+        if ($request->filled('type')) {
+            $query->where('type', $request->type);
+        }
+        
+        // Filter by Appointment Status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        
+        // Filter by Date Range
+        if ($request->filled('date_from')) {
+            $query->whereDate('appointment_date', '>=', $request->date_from);
+        }
+        
+        if ($request->filled('date_to')) {
+            $query->whereDate('appointment_date', '<=', $request->date_to);
+        }
+        
+        $appointments = $query->orderBy('id', 'desc')->paginate(15);
+        
+        // Preserve query parameters in pagination links
+        $appointments->appends($request->all());
+        
         return view('admin.appointments.index', compact('appointments'));
     }
 

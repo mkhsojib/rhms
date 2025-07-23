@@ -70,6 +70,83 @@
                 <i class="fas fa-plus"></i> Create Appointment
             </a>
         </div>
+        
+        <!-- Search Form -->
+        <div class="card-body border-bottom">
+            <form action="{{ route('superadmin.appointments.index') }}" method="GET" class="mb-0">
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="appointment_no">Appointment No</label>
+                            <input type="text" name="appointment_no" id="appointment_no" class="form-control form-control-sm" value="{{ request('appointment_no') }}">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="patient_name">Patient</label>
+                            <input type="text" name="patient_name" id="patient_name" class="form-control form-control-sm" value="{{ request('patient_name') }}">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="payment_status">Payment Status</label>
+                            <select name="payment_status" id="payment_status" class="form-control form-control-sm">
+                                <option value="">All</option>
+                                <option value="paid" {{ request('payment_status') == 'paid' ? 'selected' : '' }}>Paid</option>
+                                <option value="unpaid" {{ request('payment_status') == 'unpaid' ? 'selected' : '' }}>Unpaid</option>
+                                <option value="no_invoice" {{ request('payment_status') == 'no_invoice' ? 'selected' : '' }}>No Invoice</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="type">Type</label>
+                            <select name="type" id="type" class="form-control form-control-sm">
+                                <option value="">All</option>
+                                <option value="ruqyah" {{ request('type') == 'ruqyah' ? 'selected' : '' }}>Ruqyah</option>
+                                <option value="hijama" {{ request('type') == 'hijama' ? 'selected' : '' }}>Hijama</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select name="status" id="status" class="form-control form-control-sm">
+                                <option value="">All</option>
+                                <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                                <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Approved</option>
+                                <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Rejected</option>
+                                <option value="completed" {{ request('status') == 'completed' ? 'selected' : '' }}>Completed</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="date_from">Date From</label>
+                            <input type="date" name="date_from" id="date_from" class="form-control form-control-sm" value="{{ request('date_from') }}">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="date_to">Date To</label>
+                            <input type="date" name="date_to" id="date_to" class="form-control form-control-sm" value="{{ request('date_to') }}">
+                        </div>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <div class="form-group mb-0">
+                            <button type="submit" class="btn btn-primary btn-sm mr-2">
+                                <i class="fas fa-search"></i> Search
+                            </button>
+                            <a href="{{ route('superadmin.appointments.index') }}" class="btn btn-secondary btn-sm">
+                                <i class="fas fa-sync"></i> Reset
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-bordered table-striped">
