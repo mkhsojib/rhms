@@ -23,8 +23,15 @@
             </a>
         </div>
         
+        <!-- Search Form Toggle Button -->
+        <div class="card-header border-bottom">
+            <button type="button" class="btn btn-sm btn-outline-primary" id="toggleSearchForm">
+                <i class="fas fa-search"></i> Show Search Options
+            </button>
+        </div>
+        
         <!-- Search Form -->
-        <div class="card-body border-bottom">
+        <div class="card-body border-bottom" id="searchFormContainer" style="display: none;">
             <form action="{{ route('superadmin.users.index') }}" method="GET" class="mb-0">
                 <div class="row">
                     <div class="col-md-2">
@@ -236,6 +243,33 @@
             </div>
         </div>
     </div>
+@stop
+
+@section('js')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Toggle search form visibility
+        const toggleButton = document.getElementById('toggleSearchForm');
+        const searchContainer = document.getElementById('searchFormContainer');
+        
+        // Check if search parameters exist in URL and show form if they do
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.toString()) {
+            searchContainer.style.display = 'block';
+            toggleButton.innerHTML = '<i class="fas fa-times"></i> Hide Search Options';
+        }
+        
+        toggleButton.addEventListener('click', function() {
+            if (searchContainer.style.display === 'none') {
+                searchContainer.style.display = 'block';
+                toggleButton.innerHTML = '<i class="fas fa-times"></i> Hide Search Options';
+            } else {
+                searchContainer.style.display = 'none';
+                toggleButton.innerHTML = '<i class="fas fa-search"></i> Show Search Options';
+            }
+        });
+    });
+</script>
 @stop
 
 @section('css')
