@@ -3,9 +3,11 @@
 @section('title', 'Login - Ruqyah & Hijama Center')
 
 @section('navigation-links')
+    <a href="{{ url('/') }}" class="text-gray-700 hover:text-indigo-600 font-medium">Home</a>
 @endsection
 
 @section('mobile-navigation-links')
+    <a href="{{ url('/') }}" class="block px-3 py-2 text-gray-700 hover:text-indigo-600">Home</a>
 @endsection
 
 @section('content')
