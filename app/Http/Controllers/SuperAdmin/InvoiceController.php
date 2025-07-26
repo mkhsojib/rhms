@@ -62,7 +62,7 @@ class InvoiceController extends Controller
             'amount' => 'required|numeric|min:0',
             'discount' => 'nullable|numeric|min:0',
             'paid_amount' => 'required|numeric|min:0',
-            'payment_method' => 'required|string',
+            'payment_method' => 'required|string|in:cash,credit_card,debit_card,bank_transfer,online_payment,mobile_banking,cash_in',
             'bank_account_id' => [
                 'nullable',
                 'exists:bank_accounts,id',
@@ -75,10 +75,16 @@ class InvoiceController extends Controller
             $paymentMethod = $request->payment_method;
             $transactionType = 'payment';
             $paymentMethodForTransaction = $paymentMethod;
+            $bankAccount = null;
 
             if ($paymentMethod === 'cash_in') {
                 $transactionType = 'cash_in';
                 $paymentMethodForTransaction = 'cash';
+            }
+
+            // Get bank account if payment method is not cash
+            if ($request->bank_account_id && $paymentMethod !== 'cash') {
+                $bankAccount = BankAccount::find($request->bank_account_id);
             }
 
             $payment = Payment::create([
@@ -101,8 +107,9 @@ class InvoiceController extends Controller
                 'amount' => $request->paid_amount,
                 'status' => 'paid',
             ]);
+            
             // Create transaction
-            Transaction::create([
+            $transaction = Transaction::create([
                 'transaction_date' => now()->toDateString(),
                 'amount' => $request->paid_amount,
                 'transaction_type' => $transactionType,
@@ -120,6 +127,16 @@ class InvoiceController extends Controller
                 'related_id' => $payment->id,
                 'created_by' => Auth::id(),
             ]);
+            
+            // Update bank account balance if bank account is selected
+            if ($bankAccount) {
+                // For payments, decrease balance; for cash_in, increase balance
+                if ($transactionType === 'cash_in') {
+                    $bankAccount->increment('current_balance', $request->paid_amount);
+                } else {
+                    $bankAccount->decrement('current_balance', $request->paid_amount);
+                }
+            }
         });
         return redirect()->route('superadmin.invoices.show', $invoice)->with('success', 'Payment recorded and invoice marked as paid.');
     }

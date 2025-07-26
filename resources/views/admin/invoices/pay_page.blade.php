@@ -179,6 +179,38 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         }
     }
+
+    // Handle payment method change to show/hide bank account field
+    var paymentMethodSelect = document.getElementById('payment_method');
+    var bankAccountGroup = document.getElementById('bank_account_group');
+
+    if (paymentMethodSelect && bankAccountGroup) {
+        function toggleBankAccountField() {
+            var selectedMethod = paymentMethodSelect.value;
+            if (selectedMethod === 'cash') {
+                bankAccountGroup.style.display = 'none';
+                // Remove required attribute when hidden
+                var bankAccountSelect = bankAccountGroup.querySelector('select');
+                if (bankAccountSelect) {
+                    bankAccountSelect.removeAttribute('required');
+                    bankAccountSelect.value = '';
+                }
+            } else {
+                bankAccountGroup.style.display = 'block';
+                // Add required attribute when visible
+                var bankAccountSelect = bankAccountGroup.querySelector('select');
+                if (bankAccountSelect) {
+                    bankAccountSelect.setAttribute('required', 'required');
+                }
+            }
+        }
+
+        // Initial check
+        toggleBankAccountField();
+
+        // Add event listener
+        paymentMethodSelect.addEventListener('change', toggleBankAccountField);
+    }
 });
 </script>
 @endsection 
