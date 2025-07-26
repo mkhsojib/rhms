@@ -130,11 +130,11 @@ class InvoiceController extends Controller
             
             // Update bank account balance if bank account is selected
             if ($bankAccount) {
-                // For payments, decrease balance; for cash_in, increase balance
+                // For payments, increase balance; for cash_in, increase balance
                 if ($transactionType === 'cash_in') {
                     $bankAccount->increment('current_balance', $request->paid_amount);
                 } else {
-                    $bankAccount->decrement('current_balance', $request->paid_amount);
+                    $bankAccount->increment('current_balance', $request->paid_amount);
                 }
             }
         });
