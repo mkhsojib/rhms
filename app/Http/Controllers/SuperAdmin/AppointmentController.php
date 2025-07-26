@@ -274,8 +274,10 @@ class AppointmentController extends Controller
      */
     public function show(Appointment $appointment)
     {
-        $appointment->load(['patient', 'practitioner', 'treatment']);
-        return view('superadmin.appointments.show', compact('appointment'));
+        $appointment->load(['practitioner', 'patient', 'sessionType', 'treatment']);
+        $questions = \App\Models\Question::where('category', $appointment->type)->where('is_active', true)->get();
+        $answers = \App\Models\QuestionAnswer::where('appointment_id', $appointment->id)->pluck('answer', 'question_id');
+        return view('superadmin.appointments.show', compact('appointment', 'questions', 'answers'));
     }
 
     /**
@@ -428,6 +430,7 @@ class AppointmentController extends Controller
         // Send notification to patient
         $approvedBy = \Illuminate\Support\Facades\Auth::user();
         NotificationService::appointmentApproved($appointment, $approvedBy);
+        \App\Services\NotificationService::promptPatientToAnswerQuestions($appointment);
 
         return redirect()->route('superadmin.appointments.index')
             ->with('success', 'Appointment approved successfully.');

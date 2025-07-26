@@ -22,6 +22,7 @@ class DatabaseSeeder extends Seeder
             RaqiAvailabilitySeeder::class, // Then seed availability records
             ContactInformationSeeder::class, // Then seed contact information
             BankAccountSeeder::class, // Then seed bank accounts
+            QuestionSeeder::class, // Then seed questions
         ]);
     }
 }

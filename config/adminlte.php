@@ -540,6 +540,13 @@ return [
         ],
 
         [
+            'text' => 'Questions Management',
+            'url'  => 'superadmin/questions',
+            'icon' => 'fas fa-question-circle',
+            'can'  => 'super_admin',
+        ],
+
+        [
             'text' => 'Invoices',
             'url'  => 'superadmin/invoices',
             'icon' => 'fas fa-file-invoice',

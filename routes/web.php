@@ -50,6 +50,9 @@ Route::middleware(['auth', 'checkRole:patient'])->prefix('patient')->name('patie
     Route::post('notifications/{notification}/mark-unread', [NotificationController::class, 'markAsUnread'])->name('notifications.mark-unread');
     Route::delete('notifications/delete-read', [NotificationController::class, 'deleteRead'])->name('notifications.delete-read');
     Route::delete('notifications/{notification}', [NotificationController::class, 'destroy'])->name('notifications.destroy');
+
+    Route::get('appointments/{appointment}/questions', [\App\Http\Controllers\Patient\AppointmentQuestionController::class, 'showForm'])->name('appointments.questions.form');
+    Route::post('appointments/{appointment}/questions', [\App\Http\Controllers\Patient\AppointmentQuestionController::class, 'submitAnswers'])->name('appointments.questions.submit');
 });
 
 // Admin & Super Admin Profile Management Routes
@@ -108,6 +111,7 @@ Route::middleware(['auth', 'checkRole:super_admin'])->prefix('superadmin')->name
     // Payments
     Route::get('payments', [App\Http\Controllers\SuperAdmin\PaymentController::class, 'index'])->name('payments.index');
     Route::get('payments/{payment}', [App\Http\Controllers\SuperAdmin\PaymentController::class, 'show'])->name('payments.show');
+    Route::resource('questions', \App\Http\Controllers\SuperAdmin\QuestionController::class);
 });
 
 // SuperAdmin Appointment AJAX endpoints

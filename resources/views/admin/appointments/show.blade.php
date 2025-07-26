@@ -376,4 +376,45 @@
     </div>
 </div>
 @endif
+
+    @if($questions->count())
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">Patient Questionnaire</h3>
+                </div>
+                <div class="card-body">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Question</th>
+                                <th>Answer</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        @foreach($questions as $question)
+                            <tr>
+                                <td>{{ $question->question_text }}</td>
+                                <td>
+                                    @php $answer = $answers[$question->id] ?? null; @endphp
+                                    @if($answer === null || $answer === '')
+                                        <span class="text-muted">Not answered</span>
+                                    @elseif($question->input_type === 'checkbox')
+                                        @foreach(json_decode($answer, true) ?? [] as $val)
+                                            <span class="badge badge-info mr-1">{{ $val }}</span>
+                                        @endforeach
+                                    @else
+                                        {{ $answer }}
+                                    @endif
+                                </td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    @endif
 @endsection 

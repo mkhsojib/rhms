@@ -300,6 +300,46 @@
                             </div>
                         </div>
                     @endif
+
+                    @if($questions->count())
+                        <div class="dashboard-card rounded-lg p-6 card-shadow mt-8">
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">Your Appointment Questionnaire</h3>
+                            <table class="min-w-full divide-y divide-gray-200 mb-4">
+                                <thead>
+                                    <tr>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Question</th>
+                                        <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Answer</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200">
+                                @foreach($questions as $question)
+                                    <tr>
+                                        <td class="px-4 py-2 text-gray-700">{{ $question->question_text }}</td>
+                                        <td class="px-4 py-2">
+                                            @php $answer = $answers[$question->id] ?? null; @endphp
+                                            @if($answer === null || $answer === '')
+                                                <span class="text-gray-400">Not answered</span>
+                                            @elseif($question->input_type === 'checkbox')
+                                                @foreach(json_decode($answer, true) ?? [] as $val)
+                                                    <span class="inline-block bg-indigo-100 text-indigo-700 rounded px-2 py-1 mr-1 text-xs">{{ $val }}</span>
+                                                @endforeach
+                                            @else
+                                                {{ $answer }}
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                </tbody>
+                            </table>
+                            @if($hasUnanswered)
+                                <div class="flex justify-center mt-4">
+                                    <a href="{{ route('patient.appointments.questions.form', $appointment) }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2 rounded-lg shadow transition duration-200">
+                                        Answer Questionnaire
+                                    </a>
+                                </div>
+                            @endif
+                        </div>
+                    @endif
                 </div>
 
                 <!-- Sidebar -->

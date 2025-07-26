@@ -212,7 +212,10 @@ class AppointmentController extends Controller
         }
 
         $appointment->load(['practitioner', 'treatment', 'sessionType']);
-        return view('patient.appointments.show', compact('appointment'));
+        $questions = \App\Models\Question::where('category', $appointment->type)->where('is_active', true)->get();
+        $answers = \App\Models\QuestionAnswer::where('appointment_id', $appointment->id)->pluck('answer', 'question_id');
+        $hasUnanswered = $questions->count() > 0 && $questions->filter(fn($q) => !isset($answers[$q->id]) || $answers[$q->id] === null || $answers[$q->id] === '')->count() > 0;
+        return view('patient.appointments.show', compact('appointment', 'questions', 'answers', 'hasUnanswered'));
     }
 
     /**

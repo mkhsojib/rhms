@@ -92,8 +92,9 @@ class AppointmentPolicy
             return true;
         }
         
-        // Patients can only update their own pending appointments
-        if ($user->role === 'patient' && $appointment->user_id === $user->id && $appointment->status === 'pending') {
+        // Patients can update their own pending or approved appointments
+        if ($user->role === 'patient' && $appointment->user_id === $user->id && 
+            in_array($appointment->status, ['pending', 'approved'])) {
             return true;
         }
         
