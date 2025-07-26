@@ -21,6 +21,13 @@ class Payment extends Model
         'notes',
     ];
 
+    protected $casts = [
+        'paid_at' => 'datetime',
+        'amount' => 'decimal:2',
+        'discount' => 'decimal:2',
+        'paid_amount' => 'decimal:2',
+    ];
+
     public function invoice()
     {
         return $this->belongsTo(Invoice::class);

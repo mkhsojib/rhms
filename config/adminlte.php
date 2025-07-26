@@ -575,7 +575,7 @@ return [
                 ],
                 [
                     'text' => 'Payments',
-                    'url'  => 'superadmin/invoices',
+                    'url'  => 'superadmin/payments',
                     'icon' => 'fas fa-file-invoice',
                 ],
             ],
