@@ -12,9 +12,40 @@ class QuestionController extends Controller
         $this->middleware('can:super_admin');
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $questions = Question::orderByDesc('id')->get();
+        $query = Question::query();
+        
+        // Search functionality
+        if ($request->has('search') && $request->search) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('question_text', 'like', "%{$search}%");
+            });
+        }
+        
+        // Filter by category
+        if ($request->has('category') && $request->category) {
+            $query->where('category', $request->category);
+        }
+        
+        // Filter by input type
+        if ($request->has('input_type') && $request->input_type) {
+            $query->where('input_type', $request->input_type);
+        }
+        
+        // Filter by status
+        if ($request->has('status') && $request->status !== '') {
+            $query->where('is_active', $request->status);
+        }
+        
+        // Filter by required
+        if ($request->has('required') && $request->required !== '') {
+            $query->where('is_required', $request->required);
+        }
+        
+        $questions = $query->orderByDesc('id')->paginate(10);
+        
         return view('superadmin.questions.index', compact('questions'));
     }
 
