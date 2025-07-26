@@ -573,6 +573,11 @@ return [
                     'url'  => 'superadmin/transactions',
                     'icon' => 'fas fa-exchange-alt',
                 ],
+                [
+                    'text' => 'Payments',
+                    'url'  => 'superadmin/invoices',
+                    'icon' => 'fas fa-file-invoice',
+                ],
             ],
         ],
 
