@@ -50,14 +50,6 @@ class QuestionController extends Controller
 
     public function update(Request $request, Question $question)
     {
-        // Debug: Log the request data
-        \Log::info('Question update request data:', [
-            'all_data' => $request->all(),
-            'has_is_required' => $request->has('is_required'),
-            'is_required_value' => $request->input('is_required'),
-            'question_id' => $question->id
-        ]);
-
         $validated = $request->validate([
             'question_text' => 'required|string|max:255',
             'input_type' => 'required|in:text,radio,checkbox',
@@ -69,12 +61,6 @@ class QuestionController extends Controller
 
         $validated['is_active'] = $request->input('is_active') == '1';
         $validated['is_required'] = $request->input('is_required') == '1';
-
-        // Debug: Log the validated data
-        \Log::info('Question update validated data:', [
-            'validated' => $validated,
-            'is_required_final' => $validated['is_required']
-        ]);
 
         $question->update($validated);
 
