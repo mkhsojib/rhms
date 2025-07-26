@@ -62,6 +62,8 @@ Route::middleware(['auth', 'checkRole:admin,super_admin'])->prefix('admin')->nam
     Route::put('/profile', [AdminProfileController::class, 'update'])->name('profile.update');
     Route::get('/profile/change-password', [AdminProfileController::class, 'changePassword'])->name('profile.change-password');
     Route::put('/profile/change-password', [AdminProfileController::class, 'updatePassword'])->name('profile.update-password');
+    Route::get('appointments/{appointment}/questions/edit', [\App\Http\Controllers\Admin\AppointmentQuestionController::class, 'editForm'])->name('appointments.questions.edit');
+    Route::post('appointments/{appointment}/questions/update', [\App\Http\Controllers\Admin\AppointmentQuestionController::class, 'updateAnswers'])->name('appointments.questions.update');
 });
 
 // Super Admin Routes
@@ -113,6 +115,8 @@ Route::middleware(['auth', 'checkRole:super_admin'])->prefix('superadmin')->name
     Route::get('payments', [App\Http\Controllers\SuperAdmin\PaymentController::class, 'index'])->name('payments.index');
     Route::get('payments/{payment}', [App\Http\Controllers\SuperAdmin\PaymentController::class, 'show'])->name('payments.show');
     Route::resource('questions', \App\Http\Controllers\SuperAdmin\QuestionController::class);
+    Route::get('appointments/{appointment}/questions/edit', [\App\Http\Controllers\SuperAdmin\AppointmentQuestionController::class, 'editForm'])->name('appointments.questions.edit');
+    Route::post('appointments/{appointment}/questions/update', [\App\Http\Controllers\SuperAdmin\AppointmentQuestionController::class, 'updateAnswers'])->name('appointments.questions.update');
 });
 
 // SuperAdmin Appointment AJAX endpoints

@@ -348,6 +348,13 @@
                         </tbody>
                     </table>
                 </div>
+                @if($appointment->status !== 'completed')
+                <div class="mt-3">
+                    <a href="{{ route('superadmin.appointments.questions.edit', $appointment) }}" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Edit Answers
+                    </a>
+                </div>
+                @endif
             </div>
         </div>
     </div>

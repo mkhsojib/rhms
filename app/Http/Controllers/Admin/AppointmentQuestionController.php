@@ -1,5 +1,5 @@
 <?php
-namespace App\Http\Controllers\Patient;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
@@ -9,25 +9,25 @@ use App\Models\QuestionAnswer;
 
 class AppointmentQuestionController extends Controller
 {
-    public function showForm(Appointment $appointment)
+    public function editForm(Appointment $appointment)
     {
-        $this->authorize('view', $appointment);
+        $this->authorize('update', $appointment); // Admin can update if allowed by policy
         if ($appointment->status === 'completed') {
-            return redirect()->route('patient.appointments.show', $appointment)
+            return redirect()->route('admin.appointments.show', $appointment)
                 ->with('error', 'You cannot edit answers after the session is completed.');
         }
         $questions = Question::where('category', $appointment->type)
             ->where('is_active', true)
             ->get();
         $existingAnswers = QuestionAnswer::where('appointment_id', $appointment->id)->pluck('answer', 'question_id');
-        return view('patient.appointments.questions_form', compact('appointment', 'questions', 'existingAnswers'));
+        return view('admin.appointments.questions_form', compact('appointment', 'questions', 'existingAnswers'));
     }
 
-    public function submitAnswers(Request $request, Appointment $appointment)
+    public function updateAnswers(Request $request, Appointment $appointment)
     {
         $this->authorize('update', $appointment);
         if ($appointment->status === 'completed') {
-            return redirect()->route('patient.appointments.show', $appointment)
+            return redirect()->route('admin.appointments.show', $appointment)
                 ->with('error', 'You cannot edit answers after the session is completed.');
         }
         $questions = Question::where('category', $appointment->type)
@@ -50,6 +50,6 @@ class AppointmentQuestionController extends Controller
                 );
             }
         }
-        return redirect()->route('patient.appointments.show', $appointment)->with('success', 'Your answers have been submitted.');
+        return redirect()->route('admin.appointments.show', $appointment)->with('success', 'Answers have been updated.');
     }
 } 

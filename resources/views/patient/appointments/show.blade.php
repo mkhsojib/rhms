@@ -331,10 +331,10 @@
                                 @endforeach
                                 </tbody>
                             </table>
-                            @if($hasUnanswered)
+                            @if($appointment->status !== 'completed')
                                 <div class="flex justify-center mt-4">
                                     <a href="{{ route('patient.appointments.questions.form', $appointment) }}" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-6 py-2 rounded-lg shadow transition duration-200">
-                                        Answer Questionnaire
+                                        Edit Answers
                                     </a>
                                 </div>
                             @endif
