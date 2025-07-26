@@ -5,6 +5,7 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\Transaction;
 use App\Models\BankAccount;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -80,6 +81,23 @@ class TransactionController extends Controller
             $bank->current_balance += $transaction->amount;
         }
         $bank->save();
+        
+        // Update related invoice status if this transaction is related to a payment
+        if ($transaction->related_to === 'payment' && $transaction->related_id) {
+            $payment = Payment::find($transaction->related_id);
+            if ($payment) {
+                $invoice = $payment->invoice;
+                if ($invoice) {
+                    $invoice->status = 'unpaid';
+                    $invoice->amount = $invoice->amount - $payment->paid_amount;
+                    $invoice->save();
+                    
+                    // Optionally delete the payment record
+                    // $payment->delete();
+                }
+            }
+        }
+        
         $transaction->voided_at = now();
         $transaction->save();
         return redirect()->back()->with('success', 'Transaction voided and amount reverted.');
