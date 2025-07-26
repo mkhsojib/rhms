@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use App\Models\RaqiMonthlyAvailability;
 use App\Models\User;
+use App\Models\Invoice;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -637,5 +639,26 @@ class AppointmentController extends Controller
             ->pluck('availability_date');
         Log::info('Available dates found', ['dates' => $dates]);
         return response()->json($dates);
+    }
+
+    public function downloadInvoice(Appointment $appointment)
+    {
+        $user = Auth::user();
+        // Only allow the patient to download their own invoice
+        if ($appointment->user_id !== $user->id) {
+            abort(403);
+        }
+        $invoice = $appointment->invoice;
+        if (!$invoice) {
+            return back()->with('error', 'No invoice found for this appointment.');
+        }
+        // Only allow download if a payment/transaction exists
+        if ($invoice->transactions()->count() === 0) {
+            return back()->with('error', 'Invoice is not available for download until payment is recorded.');
+        }
+        $invoice->load(['appointment', 'patient', 'practitioner']);
+        $pdf = Pdf::loadView('superadmin.invoices.print', compact('invoice'));
+        $filename = 'Invoice_' . $invoice->invoice_no . '.pdf';
+        return $pdf->download($filename);
     }
 }

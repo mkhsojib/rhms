@@ -53,6 +53,7 @@ Route::middleware(['auth', 'checkRole:patient'])->prefix('patient')->name('patie
 
     Route::get('appointments/{appointment}/questions', [\App\Http\Controllers\Patient\AppointmentQuestionController::class, 'showForm'])->name('appointments.questions.form');
     Route::post('appointments/{appointment}/questions', [\App\Http\Controllers\Patient\AppointmentQuestionController::class, 'submitAnswers'])->name('appointments.questions.submit');
+    Route::get('appointments/{appointment}/invoice/download', [PatientAppointmentController::class, 'downloadInvoice'])->name('appointments.invoice.download');
 });
 
 // Admin & Super Admin Profile Management Routes

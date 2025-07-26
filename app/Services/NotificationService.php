@@ -6,6 +6,7 @@ use App\Models\Notification;
 use App\Models\Appointment;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
+use App\Notifications\GenericNotification;
 
 class NotificationService
 {
@@ -233,15 +234,7 @@ class NotificationService
         }
         $url = route('patient.appointments.questions.form', $appointment);
         $message = 'Your appointment has been approved. Please answer the required questions: <a href="' . $url . '">Click here to answer</a>';
-        // You can use your notification logic here (database, email, etc.)
-        // Example: send database notification
-        // Fallback: Use built-in notification if GenericNotification does not exist
-        $patient->notify(new \Illuminate\Notifications\Notification([
-            'message' => $message,
-            'url' => $url,
-        ]));
-        // Optionally, send email as well
-        // \Mail::to($patient->email)->send(new \App\Mail\GenericMail($message));
+        $patient->notify(new GenericNotification($message, $url));
     }
 
     /**
