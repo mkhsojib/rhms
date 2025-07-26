@@ -332,6 +332,11 @@
                                     </a>
                                 </div>
                             @endif
+                            <div class="flex justify-center mt-4 space-x-3">
+                                <a href="{{ route('patient.appointments.questions.download', $appointment) }}" class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-2 rounded-lg shadow transition duration-200" target="_blank">
+                                    <i class="fas fa-file-pdf mr-2"></i>Download Answers PDF
+                                </a>
+                            </div>
                         </div>
                     @endif
                 </div>
@@ -376,6 +381,12 @@
                                 <a href="{{ route('patient.appointments.questions.form', $appointment) }}"
                                    class="w-full flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-200">
                                     <i class="fas fa-question-circle mr-2"></i>Answer Questionnaire
+                                </a>
+                            @endif
+                            @if($questions->count())
+                                <a href="{{ route('patient.appointments.questions.download', $appointment) }}"
+                                   class="w-full flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition duration-200" target="_blank">
+                                    <i class="fas fa-file-pdf mr-2"></i>Download Answers PDF
                                 </a>
                             @endif
                             @if($appointment->invoice && $appointment->invoice->transactions()->count() > 0)

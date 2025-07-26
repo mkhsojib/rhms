@@ -53,6 +53,7 @@ Route::middleware(['auth', 'checkRole:patient'])->prefix('patient')->name('patie
 
     Route::get('appointments/{appointment}/questions', [\App\Http\Controllers\Patient\AppointmentQuestionController::class, 'showForm'])->name('appointments.questions.form');
     Route::post('appointments/{appointment}/questions', [\App\Http\Controllers\Patient\AppointmentQuestionController::class, 'submitAnswers'])->name('appointments.questions.submit');
+    Route::get('appointments/{appointment}/questions/download', [\App\Http\Controllers\Patient\AppointmentQuestionController::class, 'downloadAnswers'])->name('appointments.questions.download');
     Route::get('appointments/{appointment}/invoice/download', [PatientAppointmentController::class, 'downloadInvoice'])->name('appointments.invoice.download');
 });
 
@@ -64,6 +65,7 @@ Route::middleware(['auth', 'checkRole:admin,super_admin'])->prefix('admin')->nam
     Route::put('/profile/change-password', [AdminProfileController::class, 'updatePassword'])->name('profile.update-password');
     Route::get('appointments/{appointment}/questions/edit', [\App\Http\Controllers\Admin\AppointmentQuestionController::class, 'editForm'])->name('appointments.questions.edit');
     Route::post('appointments/{appointment}/questions/update', [\App\Http\Controllers\Admin\AppointmentQuestionController::class, 'updateAnswers'])->name('appointments.questions.update');
+    Route::get('appointments/{appointment}/questions/download', [\App\Http\Controllers\Admin\AppointmentQuestionController::class, 'downloadAnswers'])->name('appointments.questions.download');
 });
 
 // Super Admin Routes
@@ -117,6 +119,7 @@ Route::middleware(['auth', 'checkRole:super_admin'])->prefix('superadmin')->name
     Route::resource('questions', \App\Http\Controllers\SuperAdmin\QuestionController::class);
     Route::get('appointments/{appointment}/questions/edit', [\App\Http\Controllers\SuperAdmin\AppointmentQuestionController::class, 'editForm'])->name('appointments.questions.edit');
     Route::post('appointments/{appointment}/questions/update', [\App\Http\Controllers\SuperAdmin\AppointmentQuestionController::class, 'updateAnswers'])->name('appointments.questions.update');
+    Route::get('appointments/{appointment}/questions/download', [\App\Http\Controllers\SuperAdmin\AppointmentQuestionController::class, 'downloadAnswers'])->name('appointments.questions.download');
 });
 
 // SuperAdmin Appointment AJAX endpoints

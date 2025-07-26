@@ -420,6 +420,11 @@
                     </a>
                 </div>
                 @endif
+                <div class="mt-3">
+                    <a href="{{ route('admin.appointments.questions.download', $appointment) }}" class="btn btn-success" target="_blank">
+                        <i class="fas fa-file-pdf"></i> Download Answers PDF
+                    </a>
+                </div>
             </div>
         </div>
     </div>
