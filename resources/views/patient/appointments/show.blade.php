@@ -263,13 +263,7 @@
                         </div>
                     </div>
 
-                    @if($appointment->invoice && $appointment->invoice->transactions()->count() > 0)
-                        <div class="flex justify-center my-6">
-                            <a href="{{ route('patient.appointments.invoice.download', $appointment) }}" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-lg font-semibold flex items-center" target="_blank">
-                                <i class="fas fa-file-pdf mr-2"></i> Download PDF
-                            </a>
-                        </div>
-                    @endif
+       
 
                     <!-- Treatment Details (if completed) -->
                     @if($appointment->status === 'completed' && $appointment->treatment)
