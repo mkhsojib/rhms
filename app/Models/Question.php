@@ -14,6 +14,7 @@ class Question extends Model
         'options',
         'category',
         'is_active',
+        'is_required',
     ];
 
     protected $casts = [

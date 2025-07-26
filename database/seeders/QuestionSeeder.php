@@ -15,6 +15,7 @@ class QuestionSeeder extends Seeder
             'input_type' => 'text',
             'category' => 'ruqyah',
             'is_active' => true,
+            'is_required' => true,
         ]);
 
         Question::create([
@@ -23,6 +24,7 @@ class QuestionSeeder extends Seeder
             'options' => ['Yes', 'No', 'Not sure'],
             'category' => 'ruqyah',
             'is_active' => true,
+            'is_required' => false,
         ]);
 
         Question::create([
@@ -31,6 +33,7 @@ class QuestionSeeder extends Seeder
             'options' => ['Headache', 'Anxiety', 'Depression', 'Insomnia', 'Physical pain', 'Other'],
             'category' => 'ruqyah',
             'is_active' => true,
+            'is_required' => false,
         ]);
 
         Question::create([
@@ -39,6 +42,7 @@ class QuestionSeeder extends Seeder
             'options' => ['Less than 1 month', '1-6 months', '6-12 months', 'More than 1 year'],
             'category' => 'ruqyah',
             'is_active' => true,
+            'is_required' => false,
         ]);
 
         // Hijama Cupping Questions
@@ -47,6 +51,7 @@ class QuestionSeeder extends Seeder
             'input_type' => 'text',
             'category' => 'hijama',
             'is_active' => true,
+            'is_required' => true,
         ]);
 
         Question::create([
@@ -55,6 +60,7 @@ class QuestionSeeder extends Seeder
             'options' => ['Yes', 'No'],
             'category' => 'hijama',
             'is_active' => true,
+            'is_required' => false,
         ]);
 
         Question::create([
@@ -63,6 +69,7 @@ class QuestionSeeder extends Seeder
             'options' => ['Head', 'Neck', 'Back', 'Shoulders', 'Arms', 'Legs', 'Other'],
             'category' => 'hijama',
             'is_active' => true,
+            'is_required' => false,
         ]);
 
         Question::create([
@@ -70,6 +77,7 @@ class QuestionSeeder extends Seeder
             'input_type' => 'text',
             'category' => 'hijama',
             'is_active' => true,
+            'is_required' => false,
         ]);
 
         Question::create([
@@ -78,6 +86,7 @@ class QuestionSeeder extends Seeder
             'options' => ['Yes', 'No'],
             'category' => 'hijama',
             'is_active' => true,
+            'is_required' => false,
         ]);
     }
 } 

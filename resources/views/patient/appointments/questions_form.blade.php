@@ -10,14 +10,19 @@
             @csrf
             @foreach($questions as $question)
                 <div class="mb-4">
-                    <label class="block text-gray-700 font-semibold mb-2">{{ $question->question_text }}</label>
+                    <label class="block text-gray-700 font-semibold mb-2">
+                        {{ $question->question_text }}
+                        @if($question->is_required)
+                            <span class="text-red-500">*</span>
+                        @endif
+                    </label>
                     @if($question->input_type === 'text')
-                        <input type="text" name="answers[{{ $question->id }}]" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400" value="{{ old('answers.' . $question->id, $existingAnswers[$question->id] ?? '') }}">
+                        <input type="text" name="answers[{{ $question->id }}]" class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400" value="{{ old('answers.' . $question->id, $existingAnswers[$question->id] ?? '') }}" {{ $question->is_required ? 'required' : '' }}>
                     @elseif($question->input_type === 'radio')
                         <div class="flex flex-wrap gap-4">
                         @foreach($question->options as $option)
                             <label class="inline-flex items-center cursor-pointer">
-                                <input class="form-radio text-indigo-600 focus:ring-indigo-500" type="radio" name="answers[{{ $question->id }}]" value="{{ $option }}" {{ (old('answers.' . $question->id, $existingAnswers[$question->id] ?? '') == $option) ? 'checked' : '' }}>
+                                <input class="form-radio text-indigo-600 focus:ring-indigo-500" type="radio" name="answers[{{ $question->id }}]" value="{{ $option }}" {{ (old('answers.' . $question->id, $existingAnswers[$question->id] ?? '') == $option) ? 'checked' : '' }} {{ $question->is_required ? 'required' : '' }}>
                                 <span class="ml-2 text-gray-600">{{ $option }}</span>
                             </label>
                         @endforeach
@@ -30,7 +35,7 @@
                         <div class="flex flex-wrap gap-4">
                         @foreach($question->options as $option)
                             <label class="inline-flex items-center cursor-pointer">
-                                <input class="form-checkbox text-indigo-600 focus:ring-indigo-500" type="checkbox" name="answers[{{ $question->id }}][]" value="{{ $option }}" {{ in_array($option, $checkedValues) ? 'checked' : '' }}>
+                                <input class="form-checkbox text-indigo-600 focus:ring-indigo-500" type="checkbox" name="answers[{{ $question->id }}][]" value="{{ $option }}" {{ in_array($option, $checkedValues) ? 'checked' : '' }} {{ $question->is_required ? 'required' : '' }}>
                                 <span class="ml-2 text-gray-600">{{ $option }}</span>
                             </label>
                         @endforeach

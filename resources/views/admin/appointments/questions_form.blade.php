@@ -13,14 +13,19 @@
                         @csrf
                         @foreach($questions as $question)
                             <div class="mb-4">
-                                <label class="font-weight-bold">{{ $question->question_text }}</label>
+                                <label class="font-weight-bold">
+                                    {{ $question->question_text }}
+                                    @if($question->is_required)
+                                        <span class="text-danger">*</span>
+                                    @endif
+                                </label>
                                 @if($question->input_type === 'text')
-                                    <input type="text" name="answers[{{ $question->id }}]" class="form-control" value="{{ old('answers.' . $question->id, $existingAnswers[$question->id] ?? '') }}">
+                                    <input type="text" name="answers[{{ $question->id }}]" class="form-control" value="{{ old('answers.' . $question->id, $existingAnswers[$question->id] ?? '') }}" {{ $question->is_required ? 'required' : '' }}>
                                 @elseif($question->input_type === 'radio')
                                     <div>
                                     @foreach($question->options as $option)
                                         <label class="mr-3">
-                                            <input type="radio" name="answers[{{ $question->id }}]" value="{{ $option }}" {{ (old('answers.' . $question->id, $existingAnswers[$question->id] ?? '') == $option) ? 'checked' : '' }}> {{ $option }}
+                                            <input type="radio" name="answers[{{ $question->id }}]" value="{{ $option }}" {{ (old('answers.' . $question->id, $existingAnswers[$question->id] ?? '') == $option) ? 'checked' : '' }} {{ $question->is_required ? 'required' : '' }}> {{ $option }}
                                         </label>
                                     @endforeach
                                     </div>
@@ -32,7 +37,7 @@
                                     <div>
                                     @foreach($question->options as $option)
                                         <label class="mr-3">
-                                            <input type="checkbox" name="answers[{{ $question->id }}][]" value="{{ $option }}" {{ in_array($option, $checkedValues) ? 'checked' : '' }}> {{ $option }}
+                                            <input type="checkbox" name="answers[{{ $question->id }}][]" value="{{ $option }}" {{ in_array($option, $checkedValues) ? 'checked' : '' }} {{ $question->is_required ? 'required' : '' }}> {{ $option }}
                                         </label>
                                     @endforeach
                                     </div>

@@ -25,18 +25,22 @@ class QuestionController extends Controller
 
     public function store(Request $request)
     {
-        $data = $request->validate([
-            'question_text' => 'required|string',
+        $validated = $request->validate([
+            'question_text' => 'required|string|max:255',
             'input_type' => 'required|in:text,radio,checkbox',
             'options' => 'nullable|array',
             'category' => 'required|in:ruqyah,hijama',
+            'is_active' => 'boolean',
+            'is_required' => 'boolean',
         ]);
-        $data['is_active'] = $request->has('is_active');
-        if (isset($data['options']) && is_array($data['options'])) {
-            $data['options'] = array_values(array_filter($data['options']));
-        }
-        Question::create($data);
-        return redirect()->route('superadmin.questions.index')->with('success', 'Question created successfully.');
+
+        $validated['is_active'] = $request->input('is_active') == '1';
+        $validated['is_required'] = $request->input('is_required') == '1';
+
+        Question::create($validated);
+
+        return redirect()->route('superadmin.questions.index')
+            ->with('success', 'Question created successfully.');
     }
 
     public function edit(Question $question)
@@ -46,18 +50,36 @@ class QuestionController extends Controller
 
     public function update(Request $request, Question $question)
     {
-        $data = $request->validate([
-            'question_text' => 'required|string',
+        // Debug: Log the request data
+        \Log::info('Question update request data:', [
+            'all_data' => $request->all(),
+            'has_is_required' => $request->has('is_required'),
+            'is_required_value' => $request->input('is_required'),
+            'question_id' => $question->id
+        ]);
+
+        $validated = $request->validate([
+            'question_text' => 'required|string|max:255',
             'input_type' => 'required|in:text,radio,checkbox',
             'options' => 'nullable|array',
             'category' => 'required|in:ruqyah,hijama',
+            'is_active' => 'boolean',
+            'is_required' => 'boolean',
         ]);
-        $data['is_active'] = $request->has('is_active');
-        if (isset($data['options']) && is_array($data['options'])) {
-            $data['options'] = array_values(array_filter($data['options']));
-        }
-        $question->update($data);
-        return redirect()->route('superadmin.questions.index')->with('success', 'Question updated successfully.');
+
+        $validated['is_active'] = $request->input('is_active') == '1';
+        $validated['is_required'] = $request->input('is_required') == '1';
+
+        // Debug: Log the validated data
+        \Log::info('Question update validated data:', [
+            'validated' => $validated,
+            'is_required_final' => $validated['is_required']
+        ]);
+
+        $question->update($validated);
+
+        return redirect()->route('superadmin.questions.index')
+            ->with('success', 'Question updated successfully.');
     }
 
     public function destroy(Question $question)

@@ -69,6 +69,14 @@
                         <label class="custom-control-label" for="is_active">Active</label>
                     </div>
                 </div>
+                <div class="form-group">
+                    <label for="is_required">Required</label>
+                    <input type="hidden" name="is_required" value="0">
+                    <div class="custom-control custom-switch">
+                        <input type="checkbox" class="custom-control-input" id="is_required" name="is_required" value="1">
+                        <label class="custom-control-label" for="is_required">Required</label>
+                    </div>
+                </div>
 
                 <div class="form-group">
                     <button type="submit" class="btn btn-primary">

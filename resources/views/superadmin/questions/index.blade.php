@@ -25,6 +25,7 @@
                         <th>Type</th>
                         <th>Category</th>
                         <th>Status</th>
+                        <th>Required</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -46,6 +47,11 @@
                             <td>
                                 <span class="badge badge-{{ $question->is_active ? 'success' : 'danger' }}">
                                     {{ $question->is_active ? 'Active' : 'Inactive' }}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge badge-{{ $question->is_required ? 'warning' : 'secondary' }}">
+                                    {{ $question->is_required ? 'Required' : 'Optional' }}
                                 </span>
                             </td>
                             <td>
