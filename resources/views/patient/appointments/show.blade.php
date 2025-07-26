@@ -378,7 +378,18 @@
                     <div class="dashboard-card rounded-lg p-6 card-shadow">
                         <h3 class="text-lg font-bold text-gray-800 mb-4">Quick Actions</h3>
                         <div class="space-y-3">
-                            
+                            @if($questions->count() && $appointment->status !== 'completed')
+                                <a href="{{ route('patient.appointments.questions.form', $appointment) }}"
+                                   class="w-full flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-200">
+                                    <i class="fas fa-question-circle mr-2"></i>Answer Questionnaire
+                                </a>
+                            @endif
+                            @if($appointment->invoice && $appointment->invoice->transactions()->count() > 0)
+                                <a href="{{ route('patient.appointments.invoice.download', $appointment) }}"
+                                   class="w-full flex items-center justify-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200" target="_blank">
+                                    <i class="fas fa-file-pdf mr-2"></i>Download PDF
+                                </a>
+                            @endif
                             @if($appointment->status === 'pending')
                                 <form action="{{ route('patient.appointments.destroy', $appointment) }}" 
                                       method="POST" 
@@ -391,12 +402,10 @@
                                     </button>
                                 </form>
                             @endif
-                            
                             <a href="{{ route('patient.appointments.index') }}" 
                                class="w-full flex items-center justify-center px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition duration-200">
                                 <i class="fas fa-list mr-2"></i>View All Appointments
                             </a>
-                            
                             <a href="{{ route('patient.appointments.create') }}" 
                                class="w-full flex items-center justify-center px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition duration-200">
                                 <i class="fas fa-plus mr-2"></i>Book New Appointment
