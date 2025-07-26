@@ -17,30 +17,28 @@ class QuestionController extends Controller
         $query = Question::query();
         
         // Search functionality
-        if ($request->has('search') && $request->search) {
+        if ($request->filled('search')) {
             $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('question_text', 'like', "%{$search}%");
-            });
+            $query->where('question_text', 'like', "%{$search}%");
         }
         
         // Filter by category
-        if ($request->has('category') && $request->category) {
+        if ($request->filled('category')) {
             $query->where('category', $request->category);
         }
         
         // Filter by input type
-        if ($request->has('input_type') && $request->input_type) {
+        if ($request->filled('input_type')) {
             $query->where('input_type', $request->input_type);
         }
         
         // Filter by status
-        if ($request->has('status') && $request->status !== '') {
+        if ($request->filled('status')) {
             $query->where('is_active', $request->status);
         }
         
         // Filter by required
-        if ($request->has('required') && $request->required !== '') {
+        if ($request->filled('required')) {
             $query->where('is_required', $request->required);
         }
         

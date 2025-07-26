@@ -24,7 +24,7 @@
                 </button>
             </div>
             
-            <div class="collapse {{ request()->anyFilled(['search', 'category', 'input_type', 'status', 'required']) ? 'show' : '' }}" id="searchFilters">
+            <div class="collapse {{ (request('search') || request('category') || request('input_type') || request('status') !== null || request('required') !== null) ? 'show' : '' }}" id="searchFilters">
                 <form method="GET" action="{{ route('superadmin.questions.index') }}" class="mb-4">
                     <div class="row">
                         <div class="col-md-3">
