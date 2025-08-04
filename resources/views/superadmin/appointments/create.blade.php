@@ -151,8 +151,11 @@
                 </div>
 
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-primary" id="submit-btn">
                         <i class="fas fa-save"></i> Create Appointment
+                    </button>
+                    <button type="button" class="btn btn-warning" id="debug-btn">
+                        <i class="fas fa-bug"></i> Debug Form
                     </button>
                     <a href="{{ route('superadmin.appointments.index') }}" class="btn btn-secondary">
                         <i class="fas fa-times"></i> Cancel
@@ -736,6 +739,110 @@ document.addEventListener('DOMContentLoaded', function() {
     const sessionTypeRow = document.getElementById('session-type-row');
     sessionTypeRow.style.display = 'none'; // Hidden by default until treatment type is selected
     
+    // Add form submission debugging
+    const form = document.querySelector('form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            console.log('Form submission attempted');
+            
+            // Check all required fields
+            const requiredFields = {
+                'user_id': document.getElementById('user_id').value,
+                'type': document.getElementById('type').value,
+                'practitioner_id': document.getElementById('practitioner_id').value,
+                'appointment_date': document.getElementById('appointment_date').value,
+                'appointment_time': document.getElementById('appointment_time').value,
+                'appointment_end_time': document.getElementById('appointment_end_time').value
+            };
+            
+            // Check session type for ruqyah
+            const treatmentType = document.getElementById('type').value;
+            if (treatmentType === 'ruqyah') {
+                requiredFields['session_type_id'] = document.getElementById('session_type_id').value;
+            }
+            
+            console.log('Required fields values:', requiredFields);
+            
+            // Check for empty required fields
+            const emptyFields = [];
+            for (const [field, value] of Object.entries(requiredFields)) {
+                if (!value || value.trim() === '') {
+                    emptyFields.push(field);
+                }
+            }
+            
+            if (emptyFields.length > 0) {
+                console.error('Empty required fields:', emptyFields);
+                alert('Please fill in all required fields: ' + emptyFields.join(', '));
+                e.preventDefault();
+                return false;
+            }
+            
+            console.log('All required fields are filled. Form should submit.');
+         });
+     }
+     
+     // Add debug button functionality
+     const debugBtn = document.getElementById('debug-btn');
+     if (debugBtn) {
+         debugBtn.addEventListener('click', function() {
+             console.log('=== FORM DEBUG INFO ===');
+             
+             // Check form element
+             const form = document.querySelector('form');
+             console.log('Form element:', form);
+             console.log('Form action:', form ? form.action : 'No form found');
+             console.log('Form method:', form ? form.method : 'No form found');
+             
+             // Check all form fields
+             const formData = new FormData(form);
+             console.log('Form data:');
+             for (let [key, value] of formData.entries()) {
+                 console.log(`  ${key}: ${value}`);
+             }
+             
+             // Check required fields specifically
+             const requiredFields = {
+                 'user_id': document.getElementById('user_id').value,
+                 'type': document.getElementById('type').value,
+                 'practitioner_id': document.getElementById('practitioner_id').value,
+                 'appointment_date': document.getElementById('appointment_date').value,
+                 'appointment_time': document.getElementById('appointment_time').value,
+                 'appointment_end_time': document.getElementById('appointment_end_time').value
+             };
+             
+             const treatmentType = document.getElementById('type').value;
+             if (treatmentType === 'ruqyah') {
+                 requiredFields['session_type_id'] = document.getElementById('session_type_id').value;
+             }
+             
+             console.log('Required fields check:');
+             let hasEmptyFields = false;
+             for (const [field, value] of Object.entries(requiredFields)) {
+                 const isEmpty = !value || value.trim() === '';
+                 console.log(`  ${field}: '${value}' ${isEmpty ? '(EMPTY!)' : '(OK)'}`);
+                 if (isEmpty) hasEmptyFields = true;
+             }
+             
+             console.log('Has empty required fields:', hasEmptyFields);
+             
+             // Check CSRF token
+             const csrfToken = document.querySelector('input[name="_token"]');
+             console.log('CSRF token element:', csrfToken);
+             console.log('CSRF token value:', csrfToken ? csrfToken.value : 'Not found');
+             
+             // Try manual form submission
+             if (!hasEmptyFields) {
+                 console.log('All fields filled. Attempting manual form submission...');
+                 if (confirm('All required fields are filled. Submit the form now?')) {
+                     form.submit();
+                 }
+             } else {
+                 alert('Some required fields are empty. Please fill them first.');
+             }
+         });
+     }
+    
     // Test: Force render a simple calendar if nothing shows
     setTimeout(() => {
         const calendar = document.getElementById('availability-calendar');
@@ -822,4 +929,4 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 </script>
-@stop 
+@stop

@@ -27,8 +27,8 @@
                                     <td>#{{ $treatment->id }}</td>
                                 </tr>
                                 <tr>
-                                    <td><strong>Appointment ID:</strong></td>
-                                    <td>#{{ $treatment->appointment->id }}</td>
+                                    <td><strong>Appointment Number:</strong></td>
+                                    <td>#{{ $treatment->appointment->appointment_no }}</td>
                                 </tr>
                                 <tr>
                                     <td><strong>Treatment Type:</strong></td>
@@ -49,32 +49,7 @@
                                     <td><strong>Treatment Date:</strong></td>
                                     <td>{{ $treatment->treatment_date->format('l, F d, Y') }}</td>
                                 </tr>
-                                <tr>
-                                    <td><strong>Duration:</strong></td>
-                                    <td>{{ $treatment->duration }} minutes</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Cost:</strong></td>
-                                    <td>${{ number_format($treatment->cost, 2) }}</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Outcome:</strong></td>
-                                    <td>
-                                        @switch($treatment->outcome)
-                                            @case('successful')
-                                                <span class="badge badge-success">Successful</span>
-                                                @break
-                                            @case('partial')
-                                                <span class="badge badge-warning">Partial</span>
-                                                @break
-                                            @case('unsuccessful')
-                                                <span class="badge badge-danger">Unsuccessful</span>
-                                                @break
-                                            @default
-                                                <span class="badge badge-secondary">{{ ucfirst($treatment->outcome) }}</span>
-                                        @endswitch
-                                    </td>
-                                </tr>
+
                             </table>
                         </div>
                         <div class="col-md-6">
@@ -129,6 +104,91 @@
                             <h5><strong>Update Notes:</strong></h5>
                             <div class="alert alert-warning">
                                 {{ $treatment->update_notes }}
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- Symptoms Section -->
+                    @if($treatment->symptoms->count() > 0)
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5><strong>Symptoms Addressed:</strong></h5>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>Symptom</th>
+                                            <th>Severity</th>
+                                            <th>Notes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($treatment->symptoms as $symptom)
+                                        <tr>
+                                            <td>{{ $symptom->name }}</td>
+                                            <td>
+                                                @switch($symptom->pivot->severity)
+                                                    @case('mild')
+                                                        <span class="badge badge-success">Mild</span>
+                                                        @break
+                                                    @case('moderate')
+                                                        <span class="badge badge-warning">Moderate</span>
+                                                        @break
+                                                    @case('severe')
+                                                        <span class="badge badge-danger">Severe</span>
+                                                        @break
+                                                    @default
+                                                        <span class="badge badge-secondary">{{ ucfirst($symptom->pivot->severity) }}</span>
+                                                @endswitch
+                                            </td>
+                                            <td>{{ $symptom->pivot->notes ?: '-' }}</td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- Medicines Section -->
+                    @if($treatment->medicines->count() > 0)
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <h5><strong>Prescribed Medicines:</strong></h5>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-bordered">
+                                    <thead class="thead-light">
+                                        <tr>
+                                            <th>Medicine</th>
+                                            <th>Dosage</th>
+                                            <th>Duration</th>
+                                            <th>Timing</th>
+                                            <th>Instructions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach($treatment->medicines as $medicine)
+                                        <tr>
+                                            <td>{{ $medicine->name }}</td>
+                                            <td>{{ $medicine->pivot->dosage ?: '-' }}</td>
+                                            <td>{{ $medicine->pivot->duration_days }} days</td>
+                                            <td>
+                                                @php
+                                                    $timings = [];
+                                                    if($medicine->pivot->morning) $timings[] = 'Morning';
+                                                    if($medicine->pivot->noon) $timings[] = 'Noon';
+                                                    if($medicine->pivot->afternoon) $timings[] = 'Afternoon';
+                                                    if($medicine->pivot->night) $timings[] = 'Night';
+                                                @endphp
+                                                {{ implode(', ', $timings) ?: '-' }}
+                                            </td>
+                                            <td>{{ $medicine->pivot->instructions ?: '-' }}</td>
+                                        </tr>
+                                        @endforeach
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -283,4 +343,4 @@
         border: 3px solid #adb5bd;
     }
 </style>
-@stop 
+@stop

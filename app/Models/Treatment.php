@@ -18,8 +18,6 @@ class Treatment extends Model
         'notes',
         'prescription',
         'aftercare',
-        'duration',
-        'cost',
         'created_by',
         'updated_by',
         'creation_notes',
@@ -28,7 +26,6 @@ class Treatment extends Model
 
     protected $casts = [
         'treatment_date' => 'date',
-        'cost' => 'decimal:2',
     ];
 
     /**
@@ -85,5 +82,25 @@ class Treatment extends Model
     public function scopeCompleted($query)
     {
         return $query->where('status', 'completed');
+    }
+
+    /**
+     * Get the medicines prescribed for this treatment.
+     */
+    public function medicines()
+    {
+        return $this->belongsToMany(Medicine::class, 'treatment_medicines')
+                    ->withPivot('morning', 'noon', 'afternoon', 'night', 'dosage', 'instructions', 'duration_days')
+                    ->withTimestamps();
+    }
+
+    /**
+     * Get the symptoms addressed in this treatment.
+     */
+    public function symptoms()
+    {
+        return $this->belongsToMany(Symptom::class, 'treatment_symptoms')
+                    ->withPivot('severity', 'notes')
+                    ->withTimestamps();
     }
 }

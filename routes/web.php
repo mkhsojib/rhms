@@ -78,6 +78,8 @@ Route::middleware(['auth', 'checkRole:super_admin'])->prefix('superadmin')->name
     Route::resource('settings', SuperAdminSettingController::class);
     Route::resource('appointments', SuperAdminAppointmentController::class);
     Route::resource('treatments', SuperAdminTreatmentController::class);
+    Route::resource('medicines', App\Http\Controllers\SuperAdmin\MedicineController::class);
+    Route::resource('symptoms', App\Http\Controllers\SuperAdmin\SymptomController::class);
     Route::resource('raqi-availability', SuperAdminRaqiAvailabilityController::class)->parameters(['raqi-availability' => 'availability']);
     Route::get('raqi-availability/practitioner/{practitioner}', [SuperAdminRaqiAvailabilityController::class, 'byPractitioner'])->name('raqi-availability.by-practitioner');
     Route::resource('blogs', App\Http\Controllers\SuperAdmin\BlogController::class); // <-- Add this line
@@ -120,6 +122,10 @@ Route::middleware(['auth', 'checkRole:super_admin'])->prefix('superadmin')->name
     Route::get('appointments/{appointment}/questions/edit', [\App\Http\Controllers\SuperAdmin\AppointmentQuestionController::class, 'editForm'])->name('appointments.questions.edit');
     Route::post('appointments/{appointment}/questions/update', [\App\Http\Controllers\SuperAdmin\AppointmentQuestionController::class, 'updateAnswers'])->name('appointments.questions.update');
     Route::get('appointments/{appointment}/questions/download', [\App\Http\Controllers\SuperAdmin\AppointmentQuestionController::class, 'downloadAnswers'])->name('appointments.questions.download');
+    
+    // AJAX routes for medicines and symptoms
+    Route::get('medicines/ajax', [App\Http\Controllers\SuperAdmin\MedicineController::class, 'getMedicines'])->name('medicines.ajax');
+    Route::get('symptoms/ajax', [App\Http\Controllers\SuperAdmin\SymptomController::class, 'getSymptoms'])->name('symptoms.ajax');
 });
 
 // SuperAdmin Appointment AJAX endpoints

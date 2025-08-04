@@ -5,6 +5,8 @@ namespace App\Http\Controllers\SuperAdmin;
 use App\Http\Controllers\Controller;
 use App\Models\Appointment;
 use App\Models\Treatment;
+use App\Models\Medicine;
+use App\Models\Symptom;
 use Illuminate\Http\Request;
 
 class TreatmentController extends Controller
@@ -30,8 +32,11 @@ class TreatmentController extends Controller
             ->whereDoesntHave('treatment')
             ->with(['patient', 'practitioner'])
             ->get();
+        
+        $medicines = Medicine::active()->orderBy('name')->get();
+        $symptoms = Symptom::active()->orderBy('name')->get();
 
-        return view('superadmin.treatments.create', compact('appointments'));
+        return view('superadmin.treatments.create', compact('appointments', 'medicines', 'symptoms'));
     }
 
     /**
@@ -42,14 +47,52 @@ class TreatmentController extends Controller
         $validated = $request->validate([
             'appointment_id' => 'required|exists:appointments,id|unique:treatments,appointment_id',
             'treatment_date' => 'required|date',
-            'duration' => 'required|integer|min:15|max:480',
-            'cost' => 'required|numeric|min:0',
             'notes' => 'nullable|string',
-            'outcome' => 'required|in:successful,partial,unsuccessful',
+            'creation_notes' => 'nullable|string',
+            'symptoms' => 'nullable|array',
+            'symptoms.*' => 'exists:symptoms,id',
+            'symptom_severity' => 'nullable|array',
+            'symptom_notes' => 'nullable|array',
+            'medicines' => 'nullable|array',
+            'medicines.*' => 'exists:medicines,id',
+            'medicine_timing' => 'nullable|array',
+            'medicine_dosage' => 'nullable|array',
+            'medicine_instructions' => 'nullable|array',
+            'medicine_duration' => 'nullable|array',
         ]);
 
+        // Get the practitioner_id from the selected appointment
+        $appointment = Appointment::findOrFail($validated['appointment_id']);
+        $validated['practitioner_id'] = $appointment->practitioner_id;
         $validated['created_by'] = \Illuminate\Support\Facades\Auth::id();
-        Treatment::create($validated);
+        
+        $treatment = Treatment::create($validated);
+
+        // Attach symptoms
+        if ($request->has('symptoms')) {
+            foreach ($request->symptoms as $index => $symptomId) {
+                $treatment->symptoms()->attach($symptomId, [
+                    'severity' => $request->symptom_severity[$index] ?? 'moderate',
+                    'notes' => $request->symptom_notes[$index] ?? null,
+                ]);
+            }
+        }
+
+        // Attach medicines
+        if ($request->has('medicines')) {
+            foreach ($request->medicines as $index => $medicineId) {
+                $timing = $request->medicine_timing[$index] ?? [];
+                $treatment->medicines()->attach($medicineId, [
+                    'morning' => in_array('morning', $timing),
+                    'noon' => in_array('noon', $timing),
+                    'afternoon' => in_array('afternoon', $timing),
+                    'night' => in_array('night', $timing),
+                    'dosage' => $request->medicine_dosage[$index] ?? null,
+                    'instructions' => $request->medicine_instructions[$index] ?? null,
+                    'duration_days' => $request->medicine_duration[$index] ?? 7,
+                ]);
+            }
+        }
 
         return redirect()->route('superadmin.treatments.index')
             ->with('success', 'Treatment record created successfully.');
@@ -60,7 +103,7 @@ class TreatmentController extends Controller
      */
     public function show(Treatment $treatment)
     {
-        $treatment->load(['appointment.patient', 'appointment.practitioner']);
+        $treatment->load(['appointment.patient', 'appointment.practitioner', 'medicines', 'symptoms', 'createdBy', 'updatedBy']);
         return view('superadmin.treatments.show', compact('treatment'));
     }
 
@@ -76,8 +119,12 @@ class TreatmentController extends Controller
             })
             ->with(['patient', 'practitioner'])
             ->get();
+        
+        $medicines = Medicine::active()->orderBy('name')->get();
+        $symptoms = Symptom::active()->orderBy('name')->get();
+        $treatment->load(['medicines', 'symptoms']);
 
-        return view('superadmin.treatments.edit', compact('treatment', 'appointments'));
+        return view('superadmin.treatments.edit', compact('treatment', 'appointments', 'medicines', 'symptoms'));
     }
 
     /**
@@ -88,14 +135,50 @@ class TreatmentController extends Controller
         $validated = $request->validate([
             'appointment_id' => 'required|exists:appointments,id|unique:treatments,appointment_id,' . $treatment->id,
             'treatment_date' => 'required|date',
-            'duration' => 'required|integer|min:15|max:480',
-            'cost' => 'required|numeric|min:0',
             'notes' => 'nullable|string',
-            'outcome' => 'required|in:successful,partial,unsuccessful',
+            'update_notes' => 'nullable|string',
+            'symptoms' => 'nullable|array',
+            'symptoms.*' => 'exists:symptoms,id',
+            'symptom_severity' => 'nullable|array',
+            'symptom_notes' => 'nullable|array',
+            'medicines' => 'nullable|array',
+            'medicines.*' => 'exists:medicines,id',
+            'medicine_timing' => 'nullable|array',
+            'medicine_dosage' => 'nullable|array',
+            'medicine_instructions' => 'nullable|array',
+            'medicine_duration' => 'nullable|array',
         ]);
 
         $validated['updated_by'] = \Illuminate\Support\Facades\Auth::id();
         $treatment->update($validated);
+
+        // Sync symptoms
+        $treatment->symptoms()->detach();
+        if ($request->has('symptoms')) {
+            foreach ($request->symptoms as $index => $symptomId) {
+                $treatment->symptoms()->attach($symptomId, [
+                    'severity' => $request->symptom_severity[$index] ?? 'moderate',
+                    'notes' => $request->symptom_notes[$index] ?? null,
+                ]);
+            }
+        }
+
+        // Sync medicines
+        $treatment->medicines()->detach();
+        if ($request->has('medicines')) {
+            foreach ($request->medicines as $index => $medicineId) {
+                $timing = $request->medicine_timing[$index] ?? [];
+                $treatment->medicines()->attach($medicineId, [
+                    'morning' => in_array('morning', $timing),
+                    'noon' => in_array('noon', $timing),
+                    'afternoon' => in_array('afternoon', $timing),
+                    'night' => in_array('night', $timing),
+                    'dosage' => $request->medicine_dosage[$index] ?? null,
+                    'instructions' => $request->medicine_instructions[$index] ?? null,
+                    'duration_days' => $request->medicine_duration[$index] ?? 7,
+                ]);
+            }
+        }
 
         return redirect()->route('superadmin.treatments.index')
             ->with('success', 'Treatment record updated successfully.');
@@ -111,4 +194,4 @@ class TreatmentController extends Controller
         return redirect()->route('superadmin.treatments.index')
             ->with('success', 'Treatment record deleted successfully.');
     }
-} 
+}
