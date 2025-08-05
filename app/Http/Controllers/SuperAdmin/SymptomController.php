@@ -13,7 +13,7 @@ class SymptomController extends Controller
      */
     public function index()
     {
-        $symptoms = Symptom::orderBy('name')->paginate(15);
+        $symptoms = Symptom::orderBy('created_at', 'desc')->paginate(15);
         return view('superadmin.symptoms.index', compact('symptoms'));
     }
 
@@ -34,6 +34,7 @@ class SymptomController extends Controller
             'name' => 'required|string|max:255|unique:symptoms,name',
             'description' => 'nullable|string',
             'category' => 'nullable|string|max:255',
+            'type' => 'nullable|string|max:255',
             'is_active' => 'boolean'
         ]);
 
@@ -71,6 +72,7 @@ class SymptomController extends Controller
             'name' => 'required|string|max:255|unique:symptoms,name,' . $symptom->id,
             'description' => 'nullable|string',
             'category' => 'nullable|string|max:255',
+            'type' => 'nullable|string|max:255',
             'is_active' => 'boolean'
         ]);
 

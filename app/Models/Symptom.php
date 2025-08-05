@@ -13,6 +13,7 @@ class Symptom extends Model
         'name',
         'description',
         'category',
+        'type',
         'is_active'
     ];
 

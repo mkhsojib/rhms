@@ -468,6 +468,42 @@ return [
         ],
 
         [
+            'text' => 'Symptom Management',
+            'icon' => 'fas fa-fw fa-stethoscope',
+            'can' => 'super_admin',
+            'submenu' => [
+                [
+                    'text' => 'All Symptoms',
+                    'url' => '/superadmin/symptoms',
+                    'icon' => 'fas fa-fw fa-list',
+                ],
+                [
+                    'text' => 'Create Symptom',
+                    'url' => '/superadmin/symptoms/create',
+                    'icon' => 'fas fa-fw fa-plus',
+                ],
+            ],
+        ],
+
+        [
+            'text' => 'Medicine Management',
+            'icon' => 'fas fa-fw fa-pills',
+            'can' => 'super_admin',
+            'submenu' => [
+                [
+                    'text' => 'All Medicines',
+                    'url' => '/superadmin/medicines',
+                    'icon' => 'fas fa-fw fa-list',
+                ],
+                [
+                    'text' => 'Create Medicine',
+                    'url' => '/superadmin/medicines/create',
+                    'icon' => 'fas fa-fw fa-plus',
+                ],
+            ],
+        ],
+
+        [
             'text' => 'Blog Management',
             'icon' => 'fas fa-fw fa-blog',
             'can' => 'super_admin',

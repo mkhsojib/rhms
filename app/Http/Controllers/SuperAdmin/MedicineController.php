@@ -13,7 +13,7 @@ class MedicineController extends Controller
      */
     public function index()
     {
-        $medicines = Medicine::orderBy('name')->paginate(15);
+        $medicines = Medicine::orderBy('created_at', 'desc')->paginate(15);
         return view('superadmin.medicines.index', compact('medicines'));
     }
 
@@ -33,7 +33,8 @@ class MedicineController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:medicines,name',
             'description' => 'nullable|string',
-            'type' => 'required|string|max:255',
+            'category' => 'nullable|string|max:255',
+            'type' => 'nullable|string|max:255',
             'dosage' => 'nullable|string|max:255',
             'instructions' => 'nullable|string',
             'is_active' => 'boolean'
@@ -72,7 +73,8 @@ class MedicineController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:medicines,name,' . $medicine->id,
             'description' => 'nullable|string',
-            'type' => 'required|string|max:255',
+            'category' => 'nullable|string|max:255',
+            'type' => 'nullable|string|max:255',
             'dosage' => 'nullable|string|max:255',
             'instructions' => 'nullable|string',
             'is_active' => 'boolean'

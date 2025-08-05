@@ -24,6 +24,7 @@
                             <tr>
                                 <th>ID</th>
                                 <th>Name</th>
+                                <th>Category</th>
                                 <th>Type</th>
                                 <th>Dosage</th>
                                 <th>Status</th>
@@ -42,7 +43,18 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <span class="badge badge-info">{{ ucfirst($medicine->type) }}</span>
+                                        @if($medicine->category)
+                                            <span class="badge badge-primary">{{ ucfirst(str_replace('_', '/', $medicine->category)) }}</span>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($medicine->type)
+                                            <span class="badge badge-info">{{ ucfirst($medicine->type) }}</span>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
                                     </td>
                                     <td>{{ $medicine->dosage ?? 'N/A' }}</td>
                                     <td>

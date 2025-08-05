@@ -25,6 +25,7 @@
                                 <th>ID</th>
                                 <th>Name</th>
                                 <th>Category</th>
+                                <th>Type</th>
                                 <th>Status</th>
                                 <th>Created</th>
                                 <th>Actions</th>
@@ -42,9 +43,16 @@
                                     </td>
                                     <td>
                                         @if($symptom->category)
-                                            <span class="badge badge-info">{{ ucfirst($symptom->category) }}</span>
+                                            <span class="badge badge-info">{{ ucfirst(str_replace('_', ' ', $symptom->category)) }}</span>
                                         @else
                                             <span class="text-muted">N/A</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($symptom->type)
+                                            <span class="badge badge-warning">{{ ucfirst($symptom->type) }}</span>
+                                        @else
+                                            <span class="text-muted">-</span>
                                         @endif
                                     </td>
                                     <td>
