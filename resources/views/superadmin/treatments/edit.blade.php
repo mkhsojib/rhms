@@ -55,6 +55,59 @@ $(document).ready(function() {
         $('#symptoms-container').append(newRow);
     });
 
+    // Filter symptoms based on selected appointment
+    function updateSymptomOptions(appointmentId) {
+        if (appointmentId) {
+            $.ajax({
+                url: '{{ route("superadmin.treatments.getSymptomsByAppointment") }}',
+                type: 'POST',
+                data: {
+                    appointment_id: appointmentId,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(symptoms) {
+                    // Update all symptom select dropdowns
+                    $('.symptom-select').each(function() {
+                        const currentValue = $(this).val();
+                        $(this).empty();
+                        $(this).append('<option value="">Select Symptom</option>');
+                        
+                        symptoms.forEach(function(symptom) {
+                            const selected = currentValue == symptom.id ? 'selected' : '';
+                            $(this).append(`<option value="${symptom.id}" ${selected}>${symptom.name}</option>`);
+                        }.bind(this));
+                    });
+                },
+                error: function() {
+                    console.error('Error loading symptoms');
+                }
+            });
+        } else {
+            // Reset to show all symptoms if no appointment selected
+            $('.symptom-select').each(function() {
+                const currentValue = $(this).val();
+                $(this).empty();
+                $(this).append('<option value="">Select Symptom</option>');
+                
+                @foreach($symptoms as $symptom)
+                    const selected{{ $symptom->id }} = currentValue == '{{ $symptom->id }}' ? 'selected' : '';
+                    $(this).append(`<option value="{{ $symptom->id }}" ${selected{{ $symptom->id }}}>{{ $symptom->name }}</option>`);
+                @endforeach
+            });
+        }
+    }
+
+    $('#appointment_id').change(function() {
+        const appointmentId = $(this).val();
+        updateSymptomOptions(appointmentId);
+    });
+
+    // Initialize symptoms based on current appointment
+    const currentAppointmentId = $('#appointment_id').val();
+    if (currentAppointmentId) {
+        updateSymptomOptions(currentAppointmentId);
+    }
+
     // Remove symptom row
     $(document).on('click', '.remove-symptom', function() {
         if ($('.symptom-row').length > 1) {

@@ -126,6 +126,8 @@ Route::middleware(['auth', 'checkRole:super_admin'])->prefix('superadmin')->name
     // AJAX routes for medicines and symptoms
     Route::get('medicines/ajax', [App\Http\Controllers\SuperAdmin\MedicineController::class, 'getMedicines'])->name('medicines.ajax');
     Route::get('symptoms/ajax', [App\Http\Controllers\SuperAdmin\SymptomController::class, 'getSymptoms'])->name('symptoms.ajax');
+    Route::post('treatments/get-symptoms-by-appointment', [SuperAdminTreatmentController::class, 'getSymptomsByAppointmentType'])->name('treatments.getSymptomsByAppointment');
+    Route::post('treatments/get-patient-answers', [SuperAdminTreatmentController::class, 'getPatientAnswers'])->name('treatments.getPatientAnswers');
 });
 
 // SuperAdmin Appointment AJAX endpoints
@@ -157,6 +159,7 @@ Route::middleware(['auth', 'checkRole:admin'])->prefix('admin')->name('admin.')-
     Route::patch('appointments/{appointment}/complete', [AdminAppointmentController::class, 'complete'])->name('appointments.complete');
     
     Route::resource('treatments', AdminTreatmentController::class);
+    Route::post('treatments/get-patient-answers', [AdminTreatmentController::class, 'getPatientAnswers'])->name('treatments.getPatientAnswers');
     
     // Raqi Availability Routes
     Route::resource('availability', 'App\Http\Controllers\Admin\RaqiAvailabilityController');

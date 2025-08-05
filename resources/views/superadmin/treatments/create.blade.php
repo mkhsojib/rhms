@@ -179,6 +179,28 @@
                     @enderror
                 </div>
 
+                <!-- Patient Answers Section -->
+                <div id="patient-answers-section" class="card mt-4" style="display: none;">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0">
+                            <i class="fas fa-question-circle"></i> Patient Question Answers & Symptoms
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div id="patient-answers-content">
+                            <!-- Patient answers will be loaded here -->
+                        </div>
+                        
+                        <div id="suggested-symptoms-section" class="mt-3" style="display: none;">
+                            <hr>
+                            <h6><i class="fas fa-lightbulb"></i> Suggested Symptoms Based on Patient Answers:</h6>
+                            <div id="suggested-symptoms-content">
+                                <!-- Suggested symptoms will be displayed here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="form-group">
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-save"></i> Create Treatment
@@ -246,6 +268,101 @@ $(document).ready(function() {
         $('#symptoms-container').append(symptomRow);
         symptomIndex++;
     });
+
+    // Filter symptoms based on selected appointment
+    function updateSymptomOptions(appointmentId) {
+        if (appointmentId) {
+            $.ajax({
+                url: '{{ route("superadmin.treatments.getSymptomsByAppointment") }}',
+                type: 'POST',
+                data: {
+                    appointment_id: appointmentId,
+                    _token: '{{ csrf_token() }}'
+                },
+                success: function(symptoms) {
+                    // Update all symptom select dropdowns
+                    $('.symptom-select').each(function() {
+                        const currentValue = $(this).val();
+                        $(this).empty();
+                        $(this).append('<option value="">Select Symptom</option>');
+                        
+                        symptoms.forEach(function(symptom) {
+                            const selected = currentValue == symptom.id ? 'selected' : '';
+                            $(this).append(`<option value="${symptom.id}" ${selected}>${symptom.name}</option>`);
+                        }.bind(this));
+                    });
+                },
+                error: function() {
+                    console.error('Error loading symptoms');
+                }
+            });
+        } else {
+            // Reset to show all symptoms if no appointment selected
+            $('.symptom-select').each(function() {
+                const currentValue = $(this).val();
+                $(this).empty();
+                $(this).append('<option value="">Select Symptom</option>');
+                
+                @foreach($symptoms as $symptom)
+                    const selected{{ $symptom->id }} = currentValue == '{{ $symptom->id }}' ? 'selected' : '';
+                    $(this).append(`<option value="{{ $symptom->id }}" ${selected{{ $symptom->id }}}>{{ $symptom->name }}</option>`);
+                @endforeach
+            });
+        }
+    }
+
+    // Load patient answers for the selected appointment
+    function loadPatientAnswers(appointmentId) {
+        if (!appointmentId) {
+            $('#patient-answers-section').hide();
+            return;
+        }
+
+        $.ajax({
+            url: '{{ route('superadmin.treatments.getPatientAnswers') }}',
+            method: 'POST',
+            data: {
+                appointment_id: appointmentId,
+                _token: '{{ csrf_token() }}'
+            },
+            success: function(response) {
+                if (response.success && response.data.length > 0) {
+                    let html = '<div class="alert alert-info mb-3"><strong><i class="fas fa-info-circle"></i> Patient Question Answers:</strong></div>';
+                    
+                    response.data.forEach(function(answer) {
+                        html += `
+                            <div class="mb-3 p-3 border rounded bg-light">
+                                <div class="row">
+                                    <div class="col-md-8">
+                                        <strong class="text-primary">${answer.question}</strong>
+                                        <div class="mt-2">
+                                            <span class="badge badge-info">${answer.input_type}</span>
+                                            <span class="ml-2 text-dark">${answer.answer}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    $('#patient-answers-content').html(html);
+                    $('#patient-answers-section').show();
+                    
+                    // Show suggested symptoms section
+                    $('#suggested-symptoms-content').html('<p class="text-muted"><i class="fas fa-lightbulb"></i> Review the patient answers above to help select appropriate symptoms for treatment.</p>');
+                    $('#suggested-symptoms-section').show();
+                } else {
+                    $('#patient-answers-content').html('<div class="alert alert-warning">No question answers found for this appointment.</div>');
+                    $('#patient-answers-section').show();
+                    $('#suggested-symptoms-section').hide();
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error loading patient answers:', error);
+                $('#patient-answers-section').hide();
+            }
+        });
+    }
 
     // Remove symptom row
     $(document).on('click', '.remove-symptom', function() {
@@ -330,6 +447,12 @@ $(document).ready(function() {
         const appointmentId = $(this).val();
         const detailsCard = $('#appointment-details');
         const infoDiv = $('#appointment-info');
+        
+        // Update symptoms based on selected appointment
+        updateSymptomOptions(appointmentId);
+        
+        // Load patient answers for the selected appointment
+        loadPatientAnswers(appointmentId);
         
         if (appointmentId) {
             const selectedOption = $(this).find('option:selected');

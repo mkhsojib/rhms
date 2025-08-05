@@ -122,7 +122,7 @@ class TreatmentController extends Controller
         
         $medicines = Medicine::active()->orderBy('name')->get();
         $symptoms = Symptom::active()->orderBy('name')->get();
-        $treatment->load(['medicines', 'symptoms']);
+        $treatment->load(['medicines', 'symptoms', 'appointment']);
 
         return view('superadmin.treatments.edit', compact('treatment', 'appointments', 'medicines', 'symptoms'));
     }
@@ -193,5 +193,86 @@ class TreatmentController extends Controller
 
         return redirect()->route('superadmin.treatments.index')
             ->with('success', 'Treatment record deleted successfully.');
+    }
+
+    /**
+     * Get symptoms filtered by appointment type for AJAX requests
+     */
+    public function getSymptomsByAppointmentType(Request $request)
+    {
+        $appointmentId = $request->input('appointment_id');
+        
+        if (!$appointmentId) {
+            return response()->json([]);
+        }
+        
+        $appointment = Appointment::find($appointmentId);
+        
+        if (!$appointment) {
+            return response()->json([]);
+        }
+        
+        // Filter symptoms based on appointment type
+        $symptomsQuery = Symptom::active()->orderBy('name');
+        
+        if ($appointment->type === 'hijama') {
+            $symptomsQuery->where('type', 'hijama');
+        } elseif ($appointment->type === 'ruqyah') {
+            $symptomsQuery->where('type', 'ruqyah');
+        }
+        
+        $symptoms = $symptomsQuery->get(['id', 'name', 'type']);
+        
+        return response()->json($symptoms);
+    }
+
+    /**
+     * Get patient answers for the selected appointment
+     */
+    public function getPatientAnswers(Request $request)
+    {
+        $appointmentId = $request->input('appointment_id');
+        
+        if (!$appointmentId) {
+            return response()->json([
+                'success' => false,
+                'data' => []
+            ]);
+        }
+        
+        $appointment = Appointment::find($appointmentId);
+        
+        if (!$appointment) {
+            return response()->json([
+                'success' => false,
+                'data' => []
+            ]);
+        }
+        
+        // Get questions and answers for this appointment
+        $questions = \App\Models\Question::where('category', $appointment->type)
+            ->where('is_active', true)
+            ->get();
+        
+        $answers = \App\Models\QuestionAnswer::where('appointment_id', $appointment->id)
+            ->pluck('answer', 'question_id');
+        
+        $patientAnswers = [];
+        foreach ($questions as $question) {
+            $answer = $answers[$question->id] ?? null;
+            if ($answer) {
+                $patientAnswers[] = [
+                    'question_id' => $question->id,
+                    'question' => $question->question_text,
+                    'answer' => $answer,
+                    'input_type' => $question->input_type
+                ];
+            }
+        }
+        
+        return response()->json([
+            'success' => true,
+            'data' => $patientAnswers
+        ]);
     }
 }
