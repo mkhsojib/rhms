@@ -23,6 +23,8 @@ class DatabaseSeeder extends Seeder
             ContactInformationSeeder::class, // Then seed contact information
             BankAccountSeeder::class, // Then seed bank accounts
             QuestionSeeder::class, // Then seed questions
+            SymptomSeeder::class, // Then seed symptoms
+            MedicineSeeder::class, // Then seed medicines
         ]);
     }
 }
