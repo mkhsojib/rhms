@@ -321,6 +321,137 @@
             </div>
         </div>
     </div>
+
+    <!-- Prescription Details -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title">
+                        <i class="fas fa-prescription-bottle-alt"></i> Prescription Details
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <!-- Symptoms/Chief Complaints -->
+                    @if($appointment->treatment->symptoms && $appointment->treatment->symptoms->count() > 0)
+                    <div class="mb-4">
+                        <h5 class="text-primary"><i class="fas fa-stethoscope"></i> Chief Complaints & Symptoms</h5>
+                        <div class="row">
+                            @foreach($appointment->treatment->symptoms as $symptom)
+                            <div class="col-md-6 mb-3">
+                                <div class="card border-left-danger">
+                                    <div class="card-body py-2">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h6 class="mb-1 text-danger">{{ $symptom->name }}</h6>
+                                                <span class="badge badge-{{ $symptom->pivot->severity === 'severe' ? 'danger' : ($symptom->pivot->severity === 'moderate' ? 'warning' : 'info') }}">
+                                                    {{ ucfirst($symptom->pivot->severity ?? 'moderate') }}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        @if($symptom->pivot->notes)
+                                        <p class="text-muted small mt-2 mb-0">{{ $symptom->pivot->notes }}</p>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                            @endforeach
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- Prescribed Medicines -->
+                    @if($appointment->treatment->medicines && $appointment->treatment->medicines->count() > 0)
+                    <div class="mb-4">
+                        <h5 class="text-success"><i class="fas fa-pills"></i> Prescribed Medicines</h5>
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th>Medicine Name</th>
+                                        <th>Dosage</th>
+                                        <th>Timing</th>
+                                        <th>Duration</th>
+                                        <th>Instructions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($appointment->treatment->medicines as $medicine)
+                                    <tr>
+                                        <td>
+                                            <strong>{{ $medicine->name }}</strong>
+                                            @if($medicine->generic_name)
+                                            <br><small class="text-muted">{{ $medicine->generic_name }}</small>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <span class="badge badge-info">{{ $medicine->pivot->dosage ?? 'As prescribed' }}</span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex flex-wrap gap-1">
+                                                @if($medicine->pivot->morning)
+                                                <span class="badge badge-warning">Morning</span>
+                                                @endif
+                                                @if($medicine->pivot->noon)
+                                                <span class="badge badge-primary">Noon</span>
+                                                @endif
+                                                @if($medicine->pivot->afternoon)
+                                                <span class="badge badge-secondary">Afternoon</span>
+                                                @endif
+                                                @if($medicine->pivot->night)
+                                                <span class="badge badge-dark">Night</span>
+                                                @endif
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="text-primary">{{ $medicine->pivot->duration_days ?? 7 }} days</span>
+                                        </td>
+                                        <td>
+                                            <small>{{ $medicine->pivot->instructions ?? 'Take as directed' }}</small>
+                                        </td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- Prescription Text -->
+                    @if($appointment->treatment->prescription)
+                    <div class="mb-4">
+                        <h5 class="text-info"><i class="fas fa-file-prescription"></i> Additional Prescription Notes</h5>
+                        <div class="alert alert-light border-left-info">
+                            <p class="mb-0">{{ $appointment->treatment->prescription }}</p>
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- Aftercare Instructions -->
+                    @if($appointment->treatment->aftercare)
+                    <div class="mb-4">
+                        <h5 class="text-warning"><i class="fas fa-heart"></i> Aftercare Instructions</h5>
+                        <div class="alert alert-warning">
+                            <p class="mb-0">{{ $appointment->treatment->aftercare }}</p>
+                        </div>
+                    </div>
+                    @endif
+
+                    <!-- No Prescription Message -->
+                    @if((!$appointment->treatment->symptoms || $appointment->treatment->symptoms->count() === 0) && 
+                         (!$appointment->treatment->medicines || $appointment->treatment->medicines->count() === 0) && 
+                         !$appointment->treatment->prescription && 
+                         !$appointment->treatment->aftercare)
+                    <div class="text-center py-4">
+                        <i class="fas fa-prescription-bottle-alt fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No prescription details available</h5>
+                        <p class="text-muted">Prescription information will appear here once the treatment is completed.</p>
+                    </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
     @endif
 
     @if($questions->count())

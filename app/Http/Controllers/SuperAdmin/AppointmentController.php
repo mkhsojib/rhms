@@ -274,7 +274,7 @@ class AppointmentController extends Controller
      */
     public function show(Appointment $appointment)
     {
-        $appointment->load(['practitioner', 'patient', 'sessionType', 'treatment']);
+        $appointment->load(['practitioner', 'patient', 'sessionType', 'treatment.symptoms', 'treatment.medicines']);
         $questions = \App\Models\Question::where('category', $appointment->type)->where('is_active', true)->get();
         $answers = \App\Models\QuestionAnswer::where('appointment_id', $appointment->id)->pluck('answer', 'question_id');
         return view('superadmin.appointments.show', compact('appointment', 'questions', 'answers'));
