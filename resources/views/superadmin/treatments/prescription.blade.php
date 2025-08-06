@@ -314,12 +314,12 @@
         <div class="header">
             <div class="clinic-info">
                 <div class="clinic-details">
-                    <h1>Wellness Medical Clinic</h1>
-                    <div class="subtitle">Comprehensive Healthcare Services</div>
+                    <h1>{{ \App\Models\Setting::getValue('site_name', 'Ruqyah & Hijama Management System') }}</h1>
+                    <div class="subtitle">{{ \App\Models\Setting::getValue('site_tagline', 'Comprehensive Healthcare Services') }}</div>
                     <div class="clinic-contact">
-                        📍 123 Health Street, Medical District, City 12345<br>
-                        📞 +1 (555) 123-4567 | 📧 info@wellnessmedical.com<br>
-                        🌐 www.wellnessmedical.com
+                        📍 {{ \App\Models\Setting::getValue('contact_address', '123 Health Street, Medical District, City 12345') }}<br>
+                        📞 {{ \App\Models\Setting::getValue('contact_phone', '+1 (555) 123-4567') }} | 📧 {{ \App\Models\Setting::getValue('contact_email', 'info@wellnessmedical.com') }}<br>
+                        🌐 {{ \App\Models\Setting::getValue('site_name', 'www.wellnessmedical.com') }}
                     </div>
                 </div>
                 <div class="medical-symbol">⚕️</div>

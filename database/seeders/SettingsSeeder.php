@@ -262,33 +262,6 @@ class SettingsSeeder extends Seeder
                 'description' => 'Require email verification for new accounts',
                 'is_public' => false,
             ],
-            [
-                'key' => 'clinic_name',
-                'value' => 'Wellness Medical Clinic',
-                'type' => 'text',
-                'group' => 'system',
-                'label' => 'Clinic Name',
-                'description' => 'Name of the medical clinic/center',
-                'is_public' => true,
-            ],
-            [
-                'key' => 'clinic_phone',
-                'value' => '+880 1234567890',
-                'type' => 'text',
-                'group' => 'system',
-                'label' => 'Clinic Phone',
-                'description' => 'Primary phone number of the clinic',
-                'is_public' => true,
-            ],
-            [
-                'key' => 'clinic_address',
-                'value' => '123 Medical Center Street, Dhaka, Bangladesh',
-                'type' => 'textarea',
-                'group' => 'system',
-                'label' => 'Clinic Address',
-                'description' => 'Physical address of the clinic',
-                'is_public' => true,
-            ],
 
             // Business Settings
             [
