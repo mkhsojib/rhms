@@ -275,4 +275,41 @@ class TreatmentController extends Controller
             'data' => $patientAnswers
         ]);
     }
+
+    /**
+     * Display prescription for printing
+     */
+    public function prescription(Treatment $treatment)
+    {
+        $treatment->load([
+            'appointment.patient',
+            'appointment.practitioner',
+            'symptoms',
+            'medicines'
+        ]);
+
+        // Get patient questionnaire data
+        $appointment = $treatment->appointment;
+        $questions = \App\Models\Question::where('category', $appointment->type)
+            ->where('is_active', true)
+            ->get();
+        
+        $answers = \App\Models\QuestionAnswer::where('appointment_id', $appointment->id)
+            ->pluck('answer', 'question_id');
+        
+        $patientQuestionnaire = [];
+        foreach ($questions as $question) {
+            $answer = $answers[$question->id] ?? null;
+            if ($answer) {
+                $patientQuestionnaire[] = [
+                    'question_id' => $question->id,
+                    'question' => $question->question_text,
+                    'answer' => $answer,
+                    'input_type' => $question->input_type
+                ];
+            }
+        }
+
+        return view('superadmin.treatments.prescription', compact('treatment', 'patientQuestionnaire'));
+    }
 }

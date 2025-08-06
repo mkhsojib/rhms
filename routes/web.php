@@ -128,6 +128,7 @@ Route::middleware(['auth', 'checkRole:super_admin'])->prefix('superadmin')->name
     Route::get('symptoms/ajax', [App\Http\Controllers\SuperAdmin\SymptomController::class, 'getSymptoms'])->name('symptoms.ajax');
     Route::post('treatments/get-symptoms-by-appointment', [SuperAdminTreatmentController::class, 'getSymptomsByAppointmentType'])->name('treatments.getSymptomsByAppointment');
     Route::post('treatments/get-patient-answers', [SuperAdminTreatmentController::class, 'getPatientAnswers'])->name('treatments.getPatientAnswers');
+    Route::get('treatments/{treatment}/prescription', [SuperAdminTreatmentController::class, 'prescription'])->name('treatments.prescription');
 });
 
 // SuperAdmin Appointment AJAX endpoints

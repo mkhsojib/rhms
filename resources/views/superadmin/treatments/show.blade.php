@@ -317,6 +317,10 @@
                             <i class="fas fa-edit"></i> Edit Treatment
                         </a>
                         
+                        <a href="{{ route('superadmin.treatments.prescription', $treatment) }}" class="btn btn-info" target="_blank">
+                            <i class="fas fa-prescription"></i> Print Prescription
+                        </a>
+                        
                         <form action="{{ route('superadmin.treatments.destroy', $treatment) }}" 
                               method="POST" class="d-inline" 
                               onsubmit="return confirm('Are you sure you want to delete this treatment record?')">
