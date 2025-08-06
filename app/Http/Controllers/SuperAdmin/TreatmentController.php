@@ -312,4 +312,71 @@ class TreatmentController extends Controller
 
         return view('superadmin.treatments.prescription', compact('treatment', 'patientQuestionnaire'));
     }
+
+    /**
+     * Generate PDF for prescription
+     */
+    public function prescriptionPdf(Treatment $treatment)
+    {
+        $treatment->load([
+            'appointment.patient',
+            'appointment.practitioner',
+            'symptoms',
+            'medicines'
+        ]);
+
+        // Get patient questionnaire data
+        $appointment = $treatment->appointment;
+        $questions = \App\Models\Question::where('category', $appointment->type)
+            ->where('is_active', true)
+            ->get();
+        
+        $answers = \App\Models\QuestionAnswer::where('appointment_id', $appointment->id)
+            ->pluck('answer', 'question_id');
+        
+        $patientQuestionnaire = [];
+        foreach ($questions as $question) {
+            $answer = $answers[$question->id] ?? null;
+            if ($answer) {
+                $patientQuestionnaire[] = [
+                    'question_id' => $question->id,
+                    'question' => $question->question_text,
+                    'answer' => $answer,
+                    'input_type' => $question->input_type
+                ];
+            }
+        }
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('superadmin.treatments.prescription', compact('treatment', 'patientQuestionnaire'))
+            ->setOptions([
+                'isHtml5ParserEnabled' => true,
+                'isPhpEnabled' => true,
+                'isRemoteEnabled' => true,
+                'defaultFont' => 'DejaVu Sans',
+                'dpi' => 150,
+                'defaultPaperSize' => 'A4',
+                'chroot' => public_path(),
+                'logOutputFile' => storage_path('logs/dompdf.log'),
+                'tempDir' => storage_path('app/temp'),
+                'fontDir' => storage_path('fonts/'),
+                'fontCache' => storage_path('fonts/'),
+                'isJavascriptEnabled' => false,
+                'debugPng' => false,
+                'debugKeepTemp' => false,
+                'debugCss' => false,
+                'debugLayout' => false,
+                'debugLayoutLines' => false,
+                'debugLayoutBlocks' => false,
+                'debugLayoutInline' => false,
+                'debugLayoutPaddingBox' => false,
+                'pdfBackend' => 'CPDF',
+                'pdflibLicense' => '',
+                'fontHeightRatio' => 1.1,
+                'isPhpEnabled' => true
+            ]);
+        
+        $filename = 'prescription_' . $treatment->appointment->appointment_no . '_' . date('Y-m-d') . '.pdf';
+        
+        return $pdf->download($filename);
+    }
 }

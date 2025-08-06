@@ -211,6 +211,17 @@
                     @endif
                 </div>
             @endif
+            
+            @if($appointment->treatment)
+                <div class="mb-4 d-flex justify-content-center">
+                    <a href="{{ route('superadmin.treatments.prescription', $appointment->treatment) }}" class="btn btn-info mx-2" target="_blank">
+                        <i class="fas fa-eye"></i> View Prescription
+                    </a>
+                    <a href="{{ route('superadmin.treatments.prescription.pdf', $appointment->treatment) }}" class="btn btn-danger mx-2">
+                        <i class="fas fa-file-pdf"></i> Download Prescription PDF
+                    </a>
+                </div>
+            @endif
         </div>
 
         <div class="col-md-4">
@@ -486,4 +497,4 @@
         </div>
     </div>
 </div>
-@endif 
+@endif

@@ -9,6 +9,8 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-print-color-adjust: exact !important;
+            color-adjust: exact !important;
         }
 
         body {
@@ -29,22 +31,12 @@
         }
 
         .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #667eea !important;
+            color: white !important;
             padding: 30px;
             position: relative;
-        }
-
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 100px;
-            height: 100px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            transform: translate(30px, -30px);
+            -webkit-print-color-adjust: exact !important;
+            color-adjust: exact !important;
         }
 
         .clinic-info {
@@ -78,10 +70,11 @@
         }
 
         .doctor-info {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.2) !important;
             padding: 15px;
             border-radius: 8px;
-            backdrop-filter: blur(10px);
+            -webkit-print-color-adjust: exact !important;
+            color-adjust: exact !important;
         }
 
         .doctor-info h2 {
@@ -99,11 +92,13 @@
         }
 
         .patient-section {
-            background: #f8f9fa;
+            background: #f8f9fa !important;
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 25px;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #667eea !important;
+            -webkit-print-color-adjust: exact !important;
+            color-adjust: exact !important;
         }
 
         .section-title {
@@ -151,10 +146,12 @@
         }
 
         .symptom-card {
-            background: #fff5f5;
-            border: 1px solid #fed7d7;
+            background: #fff5f5 !important;
+            border: 1px solid #fed7d7 !important;
             border-radius: 8px;
             padding: 15px;
+            -webkit-print-color-adjust: exact !important;
+            color-adjust: exact !important;
         }
 
         .symptom-name {
@@ -165,12 +162,14 @@
 
         .symptom-severity {
             font-size: 12px;
-            background: #c53030;
-            color: white;
+            background: #c53030 !important;
+            color: white !important;
             padding: 2px 8px;
             border-radius: 12px;
             display: inline-block;
             margin-bottom: 8px;
+            -webkit-print-color-adjust: exact !important;
+            color-adjust: exact !important;
         }
 
         .symptom-notes {
@@ -189,12 +188,14 @@
         }
 
         .medicines-table th {
-            background: #667eea;
-            color: white;
+            background: #667eea !important;
+            color: white !important;
             padding: 15px 12px;
             text-align: left;
             font-weight: 600;
             font-size: 14px;
+            -webkit-print-color-adjust: exact !important;
+            color-adjust: exact !important;
         }
 
         .medicines-table td {
@@ -219,20 +220,24 @@
         }
 
         .timing-badge {
-            background: #e6fffa;
-            color: #234e52;
+            background: #e6fffa !important;
+            color: #234e52 !important;
             padding: 2px 8px;
             border-radius: 12px;
             font-size: 11px;
             font-weight: 500;
+            -webkit-print-color-adjust: exact !important;
+            color-adjust: exact !important;
         }
 
         .notes-section {
-            background: #f0fff4;
-            border: 1px solid #9ae6b4;
+            background: #f0fff4 !important;
+            border: 1px solid #9ae6b4 !important;
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 25px;
+            -webkit-print-color-adjust: exact !important;
+            color-adjust: exact !important;
         }
 
         .notes-content {
@@ -242,14 +247,16 @@
         }
 
         .footer {
-            background: #f8f9fa;
+            background: #f8f9fa !important;
             padding: 20px 30px;
-            border-top: 1px solid #e2e8f0;
+            border-top: 1px solid #e2e8f0 !important;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-size: 12px;
             color: #666;
+            -webkit-print-color-adjust: exact !important;
+            color-adjust: exact !important;
         }
 
         .prescription-date {
